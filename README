@@ -20,7 +20,9 @@
 
 *simulations: folder containing simulation results
 
-*processed_data: Data processed, ready to be  read in
+*source_data: Data saved in .csv format, to be processed by "data_processing" files to create files in "processed_data"
+
+*processed_data: Data processed, ready to be read in by the stan model fitting
 
 *caroll_data: Caroll et al.'s data, needed for comparing their model to ours
 
