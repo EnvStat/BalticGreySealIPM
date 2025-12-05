@@ -1,5 +1,4 @@
-This folder contains all code:
-
+*code:
 - set_folder.R: RUN FIRST! sets folders containing the code, the data, the Stan fit and the data where the generated plots and simulations are saved. ONLY THIS NEEDS TO BE MODIFIED when code is moved and run before anything else is ran.
 
 - grey_seal.stan: Stan file for population model
@@ -16,7 +15,12 @@ This folder contains all code:
 - detailed_hunting.R: distribution of hunting throughput the years -> Appendix:Hunting, to explain linearly decreasing hunting effort
 - model_check.Rmd: Plots for posterior predictive checks
 
-- simulations: folder containing simulation results
 - data_processing: process raw data into processed data ready to read in by rest of the code
-- Caroll_comparison: all the code of Caroll's model and comparison plots
-- stan_fit: folder where the .rds file of fitted stan model is 
+- caroll_comparison: all the code of Caroll's model and code for comparing the two models
+
+*simulations: folder containing simulation results
+
+*processed_data: Data processed, ready to be  read in
+
+*caroll_data: Caroll et al.'s data, needed for comparing their model to ours
+
