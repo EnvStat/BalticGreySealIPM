@@ -5,7 +5,7 @@
 knitr::opts_chunk$set(echo = TRUE)
 
 
-source(paste(home_folder,"readin.R",sep="")) # read in stan fit, samples, observed data
+source(paste(code_folder,"readin.R",sep="")) # read in stan fit, samples, observed data
 years.sim <- 2025:2080 #Simulated years
 t=23 #Number of years on which the model is run (2003-2025)
 
@@ -155,7 +155,7 @@ quantile(rowMeans(G), quantiles) #Average growth rate
 ## Readin and set
 
 ```{r}
-source(paste(home_folder,"simulation_setup.R",sep="")) # read in hunting quota, hunting bias and herring quality scenarios
+source(paste(code_folder,"simulation_setup.R",sep="")) # read in hunting quota, hunting bias and herring quality scenarios
 N.full.hunt=read.csv(paste(simulations_folder,"Simulation.csv",sep=""))
 N.composition.sim.median=read.csv(paste(simulations_folder,"Simulation_composition.csv",sep=""))
 b.df=read.csv(paste(simulations_folder,"Simulation_birth.csv",sep=""))

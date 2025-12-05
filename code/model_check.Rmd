@@ -1,0 +1,165 @@
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+source(paste(code_folder,"readin.R",sep="")) # read in stan fit, samples, observed data
+source(paste(code_folder,"plotting_functions.R",sep="")) # read in stan fit, samples, observed data
+
+```
+
+
+### Aerial count
+
+```{r}
+years=seq(from=2003, to=2024, length=22)
+p=pp_raster(samples$y_sim[,2:23], as.vector(years), bin_width=100, years, as.numeric(c(y_obs)), cex=2,
+          x_lab='Year', y_lab='Aerial survey count', interpolate = FALSE) +
+  guides(fill=guide_colorbar(title.position='top', direction='horizontal'),
+         colour=guide_legend(override.aes = list(size=3))) +
+  theme(legend.position = c(0.35,0.85), legend.spacing.y = unit(0.05, "cm"), 
+        legend.background = element_rect(fill = NA), panel.grid.minor = element_blank(), text = element_text(size=20))
+p
+ggsave(filename= paste(figure_folder,"post_pred_aerial_count.png",sep=""),plot=p,   width=8, height=5)
+
+```
+
+### Reproductive signs
+
+```{r}
+
+df=read.csv(paste(proc_data,"Herring.csv", sep=""))
+years=seq(from=2002, to=2024, length=23)
+
+apply(samples$z_sim, c(2,3), quantile, 0.5)
+p.post.q<- apply(samples$p, 2, quantile, quantiles)[,1:23]
+b.post.q<- apply(samples$b, 2, quantile, quantiles)[,1:23]
+Z.sim.00=samples$z_sim[,1,]
+Z.sim.10=samples$z_sim[,2,]
+Z.sim.01=samples$z_sim[,3,]
+Z.sim.11=samples$z_sim[,4,]
+Z.sim.PS=Z.sim.10+Z.sim.11
+Z=Z[,1:22]
+Z.sim.CA=Z.sim.01+Z.sim.11
+Z.tot=colSums(Z_fi)
+Z_CA.sim.q<- apply(t(Z.sim.CA)/Z.tot, 1, quantile, quantiles, na.rm=TRUE)
+Z_PS.sim.q<- apply(t(Z.sim.PS)/Z.tot, 1, quantile, quantiles, na.rm=TRUE)
+
+p<-ggplot() +
+  geom_ribbon(aes(x=years, ymin=b.post.q[1,], ymax=b.post.q[3,], fill='gray16'), alpha=0.15) +
+  geom_line(aes(x=years, y=b.post.q[2,]), col='gray16', alpha=0.5) +
+
+  geom_errorbar(aes(x=years, ymin=Z_PS.sim.q[1,], ymax=Z_PS.sim.q[3,]), alpha=0.35, color="black") +
+  geom_linerange(aes(x=years, ymin=Z_PS.sim.q[1,], ymax=Z_PS.sim.q[3,]), color = "black", alpha=0)+
+  geom_point(aes(x=years, y=(Z_fi[2,]+Z_fi[4,])/Z.tot,  size=Z.tot), color='black',alpha=1) +
+  scale_fill_identity(name='', guide='legend', labels=c('Posterior estimate \n of true value')) +
+  scale_size_continuous(name='Sample size', guide='legend') +
+  scale_y_continuous(limits=c(0,1)) +
+  
+  labs(x='Year', y='Proportion with placental scar') +
+  theme_classic() +
+
+  theme(panel.grid.minor = element_blank(), text = element_text(size=18), legend.position = c(0.47,0.2), label.position="bottom", legend.direction="horizontal") +
+  guides(size=guide_legend(title.position="top", label.position = 'bottom'),
+         fill='none')
+
+p 
+ggsave(filename= paste(figure_folder,"post_pred_PS.png",sep=""),plot=p,    width=7, height=8)
+
+p<-ggplot() +
+  geom_ribbon(aes(x=years, ymin=b.post.q[1,], ymax=b.post.q[3,], fill='gray16'), alpha=0.15) +
+  geom_line(aes(x=years, y=b.post.q[2,]), col='gray16', alpha=0.5) +
+  
+  geom_errorbar(aes(x=years, ymin=Z_CA.sim.q[1,], ymax=Z_CA.sim.q[3,]), alpha=0.35, color="black") +
+  geom_linerange(aes(x=years, ymin=Z_CA.sim.q[1,], ymax=Z_CA.sim.q[3,]), color = "black", alpha=0)+
+  geom_point(aes(x=years, y=(Z_fi[3,]+Z_fi[4,])/Z.tot, size=Z.tot), color='black', alpha=1) +
+
+  scale_fill_identity(name='', guide='legend', labels=c('Posterior estimate \n of true value')) +
+  scale_size_continuous(name='Sample size', guide='legend') +
+  scale_y_continuous(limits=c(0,1)) +
+  
+  labs(x='Year', y='Proportion with CA') +
+  theme_classic() +
+  theme(panel.grid.minor = element_blank(), text = element_text(size=18), legend.position = c(0.47,0.2), label.position="bottom", legend.direction="horizontal") +
+  guides(size=guide_legend(title.position="top", label.position = 'bottom'),
+         fill='none')
+
+p
+ggsave(filename= paste(figure_folder,"post_pred_pregCA.png",sep=""),plot=p,   width=7, height=8)
+
+```
+
+### Pregnancy samples
+
+
+```{r}
+
+years=seq(from=2002, to=2024, length=23)
+
+p.post.q<- apply(samples$p, 2, quantile, quantiles)[,1:23]
+b.post.q<- apply(samples$b, 2, quantile, quantiles)[,1:23]
+y_pr.sim=samples$y_pr_sim
+y_pr.s=y_pr[1:23]
+y_pr_tot.s=y_pr_tot[1:23]
+y_pr.sim.q<- apply(t (y_pr.sim)/y_pr_tot.s, 1, quantile, quantiles, na.rm=TRUE)
+y_pr.sim.q
+p<-ggplot() +
+  geom_ribbon(aes(x=years, ymin=p.post.q[1,], ymax=p.post.q[3,], fill='gray16'), alpha=0.15) +
+  geom_line(aes(x=years, y=p.post.q[2,]), col='gray16', alpha=0.5) +
+  
+  geom_errorbar(aes(x=years, ymin=y_pr.sim.q[1,], ymax=y_pr.sim.q[3,]), alpha=0.35, color="black") +
+  geom_linerange(aes(x=years, ymin=y_pr.sim.q[1,], ymax=y_pr.sim.q[3,]), color = "black", alpha=0)+
+  geom_point(aes(x=years, y=(y_pr.s)/y_pr_tot.s,  size=y_pr_tot.s), color='black',alpha=1) +
+  scale_fill_identity(name='', guide='legend', labels=c('Posterior estimate \n of true value')) +
+  scale_size_continuous(name='Sample size', guide='legend', 
+breaks=round(seq(min(y_pr_tot[y_pr_tot>0]), max(y_pr_tot), length.out=4))
+  ) +
+ 
+  scale_y_continuous(limits=c(0,1)) +
+  labs(x='Year', y='Pregnancy rate') +
+  theme_classic() +
+ 
+  theme(panel.grid.minor = element_blank(), text = element_text(size=18), legend.position = c(0.47,0.2), label.position="bottom", legend.direction="horizontal") +
+  guides(size=guide_legend(title.position="top", label.position = 'bottom'),
+         fill='none')
+
+p
+
+ggsave(filename= "/home/milenava/Seals/Grey_seals/Figures/num/post_pred_preg.png",plot=p,    width=7, height=8)
+
+```
+
+### SW harvest 
+
+```{r}
+font_size=20
+############### Size of the SW hunting bag ######################
+years=seq(from=2002, to=2024, length=23)
+#source("~/Seals/ringed_seal/ringed_seal/ringed_seal_code/functions/plotting_functions.R")
+p=pp_raster(samples$y_hb_sw_sim, as.vector(years), 3, years, as.numeric(y_hb_sw[1:23]), cex=2,
+          x_lab='Year', y_lab='Size of Swedish seal harvest', interpolate = FALSE) +
+#  scale_x_continuous(limits = c(2014.5, 2022.5), breaks=2015:2022) +
+  guides(fill=guide_colorbar(title.position='top', direction='horizontal'),
+         colour=guide_legend(override.aes = list(size=3))) +
+  theme(legend.position = c(0.35,0.85), legend.spacing.y = unit(0.05, "cm"), 
+        legend.background = element_rect(fill = NA), panel.grid.minor = element_blank(), text = element_text(size=font_size))
+p
+# save plot
+ggsave(filename=paste(figure_folder,"post_pred_SW_hb.png",sep=""),plot=p,   width=8, height=8)
+
+```
+### FI harvest
+
+```{r}
+############### Size of the FI hunting bag ######################
+
+p=pp_raster(samples$y_hb_fi_sim, as.vector(years), 3, years, as.numeric(y_hb_fi), cex=2,
+          x_lab='Year', y_lab='Size of Finnish seal harvest', interpolate = FALSE) +
+#  scale_x_continuous(limits = c(2014.5, 2022.5), breaks=2015:2022) +
+  guides(fill=guide_colorbar(title.position='top', direction='horizontal'),
+         colour=guide_legend(override.aes = list(size=3))) +
+    #scale_y_continuous(limits=c(0,00)) +
+  theme(legend.position ="none", panel.grid.minor = element_blank(), text = element_text(size=font_size))
+
+p
+ggsave(filename= paste(figure_folder,"post_pred_FI_hb.png",sep=""),plot=p,   width=8, height=8)
+
+```

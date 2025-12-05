@@ -1,11 +1,11 @@
 #### Read in ####
 
-source(paste(home_folder,"readin.R",sep="")) # read in stan fit, samples, observed data
+source(paste(code_folder,"readin.R",sep="")) # read in stan fit, samples, observed data
 
 #### Set up ####
 
-source(paste(home_folder,"forecast_function.R",sep="")) #contains simualting function
-source(paste(home_folder,"simulation_setup.R",sep="")) # read in hunting quota, hunting bias and herring quality scenarios
+source(paste(code_folder,"forecast_function.R",sep="")) #contains simualting function
+source(paste(code_folder,"simulation_setup.R",sep="")) # read in hunting quota, hunting bias and herring quality scenarios
 ##### Population size  and birth rate in modelled period 2003-2025 ####
 N.past <- apply(samples$N[idx,,1:(t+1)], c(1,3), sum)
 N.past.q<-t(apply(N.past,2, quantile, quantiles))
