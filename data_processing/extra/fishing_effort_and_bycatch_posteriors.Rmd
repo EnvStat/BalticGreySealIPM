@@ -1,0 +1,436 @@
+---
+title: "Fishing Effort"
+output: html_document
+date: "2024-06-25"
+---
+
+```{r}
+library("readr")
+df=read_tsv("/home/milenava/Seals/Grey_seals/Data/Fishing_effort/Effort/Fishing_fleet.tsv")
+df$gear=substring(strsplit(as.character(df[,1]), ",")[[1]][1:n*5-1],1,3)
+df$Country=substring(strsplit(as.character(df[,1]), ",")[[1]][1:n*5],1,2)
+
+df$freq=substring(strsplit(as.character(df[,1]), ",")[[1]][1:n*5-4],1,3)
+df$unit=strsplit(as.character(df[,1]), ",")[[1]][1:n*5-3]
+
+unique(df$unit)
+
+df$eng_pow=strsplit(as.character(df[,1]), ",")[[1]][1:n*5-2]
+unique(df$unit)
+df[df$Country=="FI",]
+df_fi=df[df$Country=="FI" & df$unit=="NR" & df$eng_pow=="TOTAL",]
+
+unique(df_fi$gear)
+unique(df_fi$eng_pow)
+unique(df$gear)
+library("reshape2")
+library("tidyr")
+
+df_fi
+df_fi2=as.data.frame(df_fi[,7:36])
+table(df_fi2)
+df_fi2
+spread(df_fi2, var="X1995")
+reshape(df_fi2, direction="long", varying = )
+as.matrix(df_fi2)
+, idvar = "NUM", timevar = "Type")
+
+df_fi2=melt(df_fi2,id="gear")
+
+df_fi2$Year=as.numeric(as.character(df_fi2$variable))
+df_fi2$value=as.numeric(df_fi2$value)
+df_fi2=df_fi2[df_fi2$Year>=1998,]
+library("ggplot2")
+ggplot(df_fi2, aes(x=Year, y=value, col=gear))+geom_point()
+
+df_fe$Geargroup
+df_fe$value=df_fe$Finnish.fishing.effort.in.commercial.marine.fishery..gear.day.
+ggplot(df_fe, aes(x=Year, y=value, col=Geargroup))+geom_point()
+                   
+df_fi
+                   
+```
+
+```{r}
+df_country_original=read.csv("/home/milenava/Seals/Grey_seals/Data/Fishing_effort/Effort/FDI Effort by country.csv")
+library("ggplot2")
+```
+```{r}
+df_country=df_country_original
+df_country$Total=as.numeric(df_country$Total.GT.fishing.days)
+
+
+
+unique(df_country$Gear.Type)
+df_country=df_country[df_country$Gear.Type %in% c("GNS", "GTN","GEF", "GND", "GTR", "GND", "GNC"),]
+df_country=df_country[df_country$Country %in% c("Finland"),]
+
+length(df_country$Total.GT.days.at.sea=="C")
+length(df_country)
+df_country[df_country$Total.GT.days.at.sea!="C",]
+
+#, "Sweden", "Estonia"),]
+
+df_ag=aggregate(data=df_country, Total ~ Year+Gear.Type, FUN=sum)
+ggplot(df_ag, aes(x=Year, y=Total, fill=Gear.Type))+geom_bar(stat="identity")
+
+plot(aggregate(df_ag, Total ~ Year, FUN=sum))
+df_ag=aggregate(data=df_country, Total ~ Country+Gear.Type, FUN=sum)
+ggplot(df_ag, aes(x=Country, y=Total, fill=Gear.Type))+geom_bar(stat="identity")
+
+```
+
+# Fishing effor data processing
+```{r}
+df_fe=read.csv("/home/milenava/Seals/Grey_seals/Data/Fishing_effort/ICES_Aggregated_fishing_Effort.csv")
+df_fe
+for (g in unique(df_fe$Geargroup)){
+  df_g=df_fe[df_fe$Geargroup==g,][2002<=df_fe$Year & df_fe$Year<=2023,]
+  plot(df_g$Year, df_g$Finnish.fishing.effort.in.commercial.marine.fishery..gear.day., main=g, ylim=c(0, max(df_g$Finnish.fishing.effort.in.commercial.marine.fishery..gear.day., na.rm=TRUE)))
+}
+df_fe
+df_g=df_fe[df_fe$Geargroup=="Trawls",][2013<=df_fe$Year & df_fe$Year<=2022,]
+df_g
+
+plot(df_g$Year, df_g$Finnish.fishing.effort.in.commercial.marine.fishery..gear.day., main="Gillnets")
+plot(aggregate(df_ag, Total ~ Year, FUN=sum))
+
+
+
+df_fe=df_fe[df_fe$Geargroup=="Trap nets",][2002<=df_fe$Year & df_fe$Year<=2023,]
+df_fe
+#df_fe=df_fe[1:22,]
+df_fe$FE=df_fe$Finnish.fishing.effort.in.commercial.marine.fishery..gear.day.
+length(df_fe$FE)
+df_fe
+path<-"/home/milenava/Seals/Grey_seals/Processed_data/"
+write.csv(df_fe[c("Year", "FE")], paste(path,"Fishing_effort.csv", sep=""))
+plot(df_fe$Year, df_fe$FE)
+
+df_fe[c("Year", "FE")]
+```
+
+```{r}
+for ( i in 24:32){
+  df_fe=read.csv(paste("/home/milenava/Seals/Grey_seals/Data/Fishing_effort/ICES_", i, "_Fishing_effort_1998-2023.csv", sep=""))
+  GT=unique(df_fe$Geargroup)
+  for( j in 1:5){
+    plot(df_fe[,j+2])
+  }
+  
+}
+```
+
+```{r}
+for ( j in 1:5){
+  df_fe=read.csv(paste("/home/milenava/Seals/Grey_seals/Data/Fishing_effort/ICES_", 24, "_Fishing_effort_1998-2023.csv", sep=""))
+  plot(df_fe$Year,df_fe[,j+2], type='l')
+  for ( i in 25:32){
+    df_fe=read.csv(paste("/home/milenava/Seals/Grey_seals/Data/Fishing_effort/ICES_", i, "_Fishing_effort_1998-2023.csv", sep=""))
+    GT=unique(df_fe$Geargroup)
+    plot(df_fe[,j+2], col=C[i-24])
+  }
+  
+}
+C=c("red", "green","darkgreen","blue", "darkblue", "brown","orange")
+```
+
+```{r}
+for ( i in 24:32){
+    df_fe=read.csv(paste("/home/milenava/Seals/Grey_seals/Data/Fishing_effort/ICES_", i, "_Fishing_effort_1998-2023.csv", sep=""))
+    print(sum(df_fe$Trawls, na.rm=TRUE))
+    plot(df_fe$Year,df_fe$Trawls, main=i)
+}
+  
+```
+
+
+
+
+# Plot
+```{r}
+df_fe=read.csv("/home/milenava/Seals/Grey_seals/Data/Fishing effort/ICES_28_Fishing_effort_1998-2023.csv")
+df_fe=df_fe[1:29,]
+plot(df_fe$Year, df_fe$Gillnets)
+plot(df_fe$Year, df_fe$Trawls)
+
+
+
+df_fe=read.csv("/home/milenava/Seals/Grey_seals/Data/Fishing effort/ICES_29_Fishing_effort_1998-2023.csv")
+df_fe=df_fe[1:29,]
+plot(df_fe$Year, df_fe$Gillnets)
+plot(df_fe$Year, df_fe$Trawls)
+
+
+df_fe=read.csv("/home/milenava/Seals/Grey_seals/Data/Fishing effort/ICES_32_Fishing_effort_1998-2023.csv")
+df_fe=df_fe[1:29,]
+plot(df_fe$Year, df_fe$Gillnets)
+plot(df_fe$Year, df_fe$Trawls)
+
+```
+
+
+```{r}
+C=10^(-7)
+log(C)
+hist(rlnorm(100,-13,0.3))
+plot(df_fe$Year,1-exp(-C*df_fe$FE))
+1-exp(-C*df_fe$FE)
+df_fe$FE
+df_fe
+df_fe[c("Year", "FE")]
+length(df_fe$FE)
+df_fe
+write.csv(df_fe[c("Year", "FE")], "Fishing_effort.csv")
+getwd()
+
+df_fe$FE
+
+-log(1-500/22000)/166753
+
+
+
+
+```
+
+# first look
+
+```{r}
+df_01=read.csv("/home/milenava/Seals/Grey_seals/Data/Fishing_effort/bycatch_2001.txt", sep="\t", check.names=FALSE, header=FALSE)
+df_01=t(df_01)
+
+df_04=read.csv("/home/milenava/Seals/Grey_seals/Data/Fishing_effort/bycatch_2004.txt", sep="\t", check.names=FALSE, header=FALSE)
+df_04=t(df_04)
+
+df_12=read.csv("/home/milenava/Seals/Grey_seals/Data/Fishing_effort/bycatch_2012.txt", sep="\t", check.names=FALSE, header=FALSE)
+df_12=t(df_12)
+```
+
+```{r}
+plot(df_01[,1], df_01[,2], type='l', xlim=c(0,4000))
+
+lines(df_04[,1], df_04[,2], type='l', col="darkgreen")
+lines(df_12[,1], df_12[,2], type='l', col='red')
+
+```
+# 2002
+```{r}
+plot(df_01[,1], df_01[,2], type='l', xlim=c(0,4000))
+
+df=df_01
+E=sum(as.numeric(as.vector(df[,1]*df[,2])), na.rm=TRUE)
+
+V=sum(as.numeric(as.vector(df[,1]^2*df[,2])), na.rm=TRUE)-E^2
+
+
+plot(df_01[,1], df_01[,2], type='l', xlim=c(0,4000))
+lines(dnorm(df[,1], E, sqrt(V)), col='red')
+E
+sqrt(V)
+```
+
+
+```{r}
+df_bc=t(df_04)
+
+df_bc[,2]
+BC.04=as.
+
+  
+  
+matrix(as.matrix(t(df_04)), ncol=2)
+df_04
+
+as.matrix(t(df_04))
+BC.04[,1]
+df=t(df_04)
+plot(t(df_04)[,1], t(df_04)[,2], type='l')
+
+plot(df_01[,1], df_01[,2], type='l', xlim=c(0,4000))
+sum(as.vector(df[,1]*df[,2]))
+
+E=sum(as.numeric(as.vector(df[,1]*df[,2])), na.rm=TRUE)
+
+V=sum(as.numeric(as.vector(df[,1]^2*df[,2])), na.rm=TRUE)-E^2
+
+plot(df[,1],dnorm(df[,1], E, sqrt(V)), type='l', col='red')
+
+lines(t(df_04)[,1], t(df_04)[,2], type='l')
+
+hist(rnorm(1000, E, sqrt(V)))
+df[,1]
+sum(df[,1]*df[,2]+1)
+
+E
+sqrt(V)
+
+plot(df_fe$Year,df_fe$FE)
+```
+
+
+
+```{r}
+df_04=read.csv("/home/milenava/Seals/Grey_seals/Data/Fishing effort/bycatch_2012.txt", sep="\t", check.names=FALSE, header=FALSE)
+
+
+
+df=t(df_04)
+35
+plot(df[,1],df[,2], type='l')
+sum(df[,2], na.rm=TRUE)
+
+df=df[1000:12000,]
+#df[,1]=df[,1]-1000
+df[,1]=df[,1]/1000
+df[,1]
+plot(df[,1], df[,2], type='l', xlim=c(0,4))
+
+m
+sigma2
+plot(t(df_04)[,1], t(df_04)[,2], type='l')
+
+sum(as.vector(df[,1]*df[,2]))
+
+E=sum(as.numeric(as.vector(df[,1]*df[,2])), na.rm=TRUE)
+
+V=sum(as.numeric(as.vector(df[,1]^2*df[,2])), na.rm=TRUE)-E^2
+
+df[,1]
+E^2/V
+V
+E
+plot(df[,1],dgamma(df[,1], E^2/V, E/V), type='l')
+V
+hist(rnorm(1000, E, sqrt(V)))
+df[,1]
+sum(df[,1]*df[,2]+1)
+
+median(c(1,2,3,4), rm.na=TRUE)
+E/V
+
+as.vector(df[,2])
+cum(df[,1])
+
+M=which(0<(cumsum(df[,2])-0.5)& (cumsum(df[,2])-0.5)<0.001)
+M=df[M,1]
+max(which(cumsum(df[,2])<0.0001))
+
+
+plot((df[,1]-1000)/1000,dgamma((df[,1]-1000)/1000, 2,1), type='l')
+df
+
+dgamma(df[,1]-1000, 1,10)
+length(df[,1])
+df=df[1000:12000,]
+df[,1]-1000
+m=log(M)
+m
+sigma2=2*(log(E)-log(M))
+sigma2
+
+plot(df[,1],df[,2], type='l')
+lines(df[,1], dlnorm(df[,1],0.16, sqrt(sigma2))/1000, type='l', col='red')
+library("sn")
+dsn(1,1,1,1)
+df[,1]
+sum(dlnorm(df[,1],m, sqrt(sigma2)))
+sum(df[,2])
+length(df[,2])
+
+plot(df[,1],cumsum(df[,2]), type='l', xlim=c(0,3))
+plot(df[,1], df[,2], type='l', xlim=c(0,3))
+df
+m
+sqrt(sigma2)
+
+
+```
+
+
+```{r}
+
+df[,1]=df[,1]/1000
+plot(df[,1], df[,2], type='l', xlim=c(0,4))
+
+m
+sigma2
+plot(t(df_04)[,1], t(df_04)[,2], type='l')
+
+sum(as.vector(df[,1]*df[,2]))
+
+E=sum(as.numeric(as.vector(df[,1]*df[,2])), na.rm=TRUE)
+
+V=sum(as.numeric(as.vector(df[,1]^2*df[,2])), na.rm=TRUE)-E^2
+
+```
+```{r}
+plot(df[,1],df[,2], type='l')
+lines(df[,1], dsn(df[,1], E-0.75, 0.55*sqrt(V), 6)/1000, type='l', col='red')
+
+E-0.75
+0.55*sqrt(V)
+
+p=0.9
+k=0.5
+
+p*exp(k)/(1-p*(1-exp(k)))
+```
+
+```{r}
+x=seq(0,1, length=100)
+A=c(0.1,0.5,1,2,4,10,30, 100)
+a=25
+plot(x, a*x^2/(1+(a-1)*x^2), type='l')
+for(a in A){
+  lines(x,a*x^2/(1+(a-1)*x^2))
+}
+
+
+```
+
+```{r}
+N1=20500
+N2=31500
+C1=-log(1-350/20500)
+C2=-log(1-1300/31500)
+C2
+B2=1300
+k=log(C2/C1)/(31500-20500)
+C=C1/exp(k*N1)
+E=167005
+B=(1-exp(-C2*E))*N2
+
+
+-log(1-1000/N2)/E
+hist(rlnorm(100,-17,0.3))
+(1-exp(-C1))*N1
+
+N=seq(20000, 60000, length=20)
+
+c=0.003
+
+k=0.0000000001
+C=C1/(1-exp(-k*N1))
+
+C
+N=N2
+(1-exp(-C*(1-exp(-k*N))))*N
+plot(N, (1-exp(-C*(1-exp(-k*N))))*N)
+
+
+C=(log(1-1300/N2)-log(1-350/N1))/(N1-N2)
+k=-log(1-1300/N2)-N2*C
+
+k
+N=seq(20000, 60000, length=20)
+plot(N, (1-exp(-C*N-k))*N)
+N=N2
+(1-exp(-C*N-k))*N
+C*N+k
+k
+1300/350
+N2/N1
+
+-C*N-k
+```
+

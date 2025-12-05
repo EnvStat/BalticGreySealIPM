@@ -1,0 +1,112 @@
+---
+title: "haulout_obs_smhi_SW"
+output: html_document
+date: "2024-05-21"
+---
+```{r}
+library(ggplot2)
+df_seals=as.data.frame(read.table("sharkweb_data (3).txt", comment.char = "@" ,sep=";",header=TRUE,fill = TRUE ,fileEncoding="latin1"))
+df_seals$Value=as.numeric(df_seals$Value)
+
+df=subset(df_seals, select=c("Year", "Month","Station.name","Value", "Sampling.date..start.", "Sampling.time..start.", "Sample.latitude..DD.","Sample.longitude..DD.", "Sea.area.name","Sea.basin","County"))
+df$Lat=df$Sample.latitude..DD.
+df$Long=df$Sample.longitude..DD.
+
+Lat=df$Lat
+df$Lat=as.numeric(gsub(",", ".",Lat))
+Long=df$Long
+df$Long=as.numeric(gsub(",", ".",Long))
+
+head(df)
+```
+```{r}
+
+df_ag=merge(aggregate(Value ~ Year+Station.name, data=df, FUN=max),aggregate(Lat ~ Year+Station.name, data=df, FUN=max))
+df_ag=merge(df_ag,aggregate(Long~ Year+Station.name, data=df, FUN=max))
+
+df_ag2=merge(aggregate(Value ~Long+Lat,data=df_ag, FUN=mean),aggregate(Station.name ~Long+Lat,data=df_ag, FUN=max))
+
+df_ho=merge(aggregate(data=df_ag2, Value~ Long+Lat,FUN=sum), aggregate(Station.name~ Long+Lat,FUN=max,data=df_ag2))
+
+df_yearly=aggregate(Value ~Year, data=df_ag, FUN=sum)
+plot(aggregate(Value ~Year, data=df_ag, FUN=sum))
+df_ag2$Lat=round(df_ag2$Lat,1)
+df_ag2$Long=round(df_ag2$Long,1)
+df_ag2
+df_ho=aggregate(data=df_ag2, Value~ Long+Lat,FUN=sum)
+
+df_ho=merge(aggregate(data=df_ag2, Value~ Long+Lat,FUN=sum), aggregate(Station.name~ Long+Lat,FUN=max,data=df_ag2))
+
+df_ho=df_ho[df_ho$Value>=1,]
+
+ggplot(df_ho, aes(x=Long, y=Lat))+geom_point(aes(size=Value))
+```
+```{r}
+Stations_ho=aggregate(Station.name~ Lat+Long, data=df[df$Value>0,], FUN=max)
+Stations_ho=Stations_ho[Stations_ho$Long>15,]
+Stations_ho$Lat=round(Stations_ho$Lat,2)
+Stations_ho$Long=round(Stations_ho$Long,2)
+ggplot(Stations_ho, aes(x=Long, y=Lat))+geom_point()
+
+Stations_w=read.csv("metobs_wind_core_sites.csv",sep=";")
+str(Stations_w)
+Stations_w$Lat=round(as.numeric(Stations_w$Latitude),2)
+Stations_w
+Stations_w$Long=round(as.numericStations_w$Longitude),2)
+Stations=merge(Stations_ho,Stations_w,on=c(Lat,Long))
+
+Stations
+Stations_id=unique(Stations$Id)
+
+
+```
+```{r}
+url<- "https://opendata-download-metobs.smhi.se/api/version/1.0/"
+parameter<- "4"
+period <- "corrected-archive"
+
+df_wind=data.frame()
+i=0
+for (id in Stations_id){
+  
+  station=id
+  url_full=paste(url,"parameter/", parameter,"/station/", station,"/period/", period, "/data.csv", sep="" )
+  df_temp=as.data.frame(read.csv(url_full, skip= 100,sep=";"), header=TRUE, sep=";")
+  df_temp=df_temp[df_temp[,2]=="12:00:00",]
+  df_temp$Year=as.numeric(substr(df_temp[,1],1,4))
+  df_temp$Month=as.numeric(substr(df_temp[,1],6,7))
+  df_temp$Day=as.numeric(substr(df_temp[,1],9,10))
+  if(max(df_temp$Year)>=2020){
+    i=i+1
+    df_temp=df_temp[df_temp$Year>=2003,]
+    df_temp=df_temp[((df_temp$Month==5)&(df_temp$Day>15))|((df_temp$Month==6)&(df_temp$Day<15)),]
+    df_temp_head=head(read.csv(url_full))
+    
+    df_temp$wind_Val=df_temp[,3]
+    df_temp=aggregate(wind_Val ~Year,data=df_temp,FUN=mean)
+    
+    df_temp$Id=id
+    df_temp=merge(df_temp,Stations,on=Id)
+    df_temp=df_temp[,1:6]
+    if(i==1){df_wind=df_temp}
+    else{df_wind=rbind(df_wind,df_temp)}
+  
+    }
+}
+df_wind
+df_merged=merge(df_ho[,3:4],df_wind, by="Station.name",all.y= TRUE)
+
+df_ho
+df_ho[,3:4]
+df_ho
+```
+
+```{r}
+for (y in 2003:2023){
+  
+  df_y=df_merged[df_merged$Year==y,]
+  print(df_y)
+  ggplot(df_y, aes(x=Long, y=Lat))+geom_point(aes(size=wind_Val))
+}
+```
+
