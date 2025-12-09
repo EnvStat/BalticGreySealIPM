@@ -105,15 +105,17 @@ for ( j in 1:length(B.list)){
 
 N.sim.80.her=array(NA, dim=c(length(H.list), length(idx)))
 for ( j in 1:length(H.list)){
-  N.sim.80.her[j,]=N.sim[4,1,H.list[j],,length(years.sim)]
+  N.sim.80.her[j,]=N.sim[5,1,H.list[j],,length(years.sim)]
 }
 
 write.csv(as.data.frame(N.sim.80.bias), paste(simulations_folder,"Simulation_2080_hunting_bias.csv",sep=""), row.names = FALSE) #Posterior distribution in 2080 under historical herring and varying harvest size and bias
 write.csv(as.data.frame(N.sim.80.her),paste(simulations_folder, "Simulation_2080_hunting_her.csv",sep=""), row.names = FALSE)  #Posterior distribution in 2080 under harvest size of 3600, historical bias and varying herring quality
 
-N.sim.80.3600=apply(N.sim[4,,,,length(years.sim)]>100, c(1,2), sum)/length(idx)*100
-N.sim.80.4800=apply(N.sim[5,,,,length(years.sim)]>100, c(1,2), sum)/length(idx)*100
 
+N.sim.80.3050=apply(N.sim[4,,,,length(years.sim)]>100, c(1,2), sum)/length(idx)*100
+N.sim.80.3600=apply(N.sim[5,,,,length(years.sim)]>100, c(1,2), sum)/length(idx)*100
+N.sim.80.4800=apply(N.sim[6,,,,length(years.sim)]>100, c(1,2), sum)/length(idx)*100
 
+write.csv(as.data.frame(N.sim.80.3050), paste(simulations_folder,"Simulation_2080_3050.csv",sep=""), row.names = FALSE) #Posterior distribution in 2080 under historical herring and varying harvest size and bias
 write.csv(as.data.frame(N.sim.80.3600), paste(simulations_folder,"Simulation_2080_3600.csv",sep=""), row.names = FALSE) #Posterior distribution in 2080 under historical herring and varying harvest size and bias
 write.csv(as.data.frame(N.sim.80.4800),paste(simulations_folder, "Simulation_2080_4800.csv",sep=""), row.names = FALSE)  #Posterior distribution in 2080 under harvest size of 3600, historical bias and varying herring quality

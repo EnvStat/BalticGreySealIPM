@@ -4,6 +4,8 @@
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
+#open set_folders.R and RUN!!!
+
 
 source(paste(code_folder,"readin.R",sep="")) # read in stan fit, samples, observed data
 years.sim <- 2025:2080 #Simulated years
@@ -161,19 +163,44 @@ N.composition.sim.median=read.csv(paste(simulations_folder,"Simulation_compositi
 b.df=read.csv(paste(simulations_folder,"Simulation_birth.csv",sep=""))
 N.sim.80.bias=read.csv(paste(simulations_folder,"Simulation_2080_hunting_bias.csv",sep=""))
 N.sim.80.her=read.csv(paste(simulations_folder,"Simulation_2080_hunting_her.csv",sep=""))
+
+N.sim.80.3050=read.csv(paste(simulations_folder,"Simulation_2080_3050.csv",sep=""))
 N.sim.80.3600=read.csv(paste(simulations_folder,"Simulation_2080_3600.csv",sep=""))
 N.sim.80.4800=read.csv(paste(simulations_folder,"Simulation_2080_4800.csv",sep=""))
 
+
+rownames(N.sim.80.her)<-her.breaks
+N.sim.80.her=
+N.sim.80.her[c("Mean of historical" ,        "-0.2g/yr",   "-4g in 2025"  , "+0.2g/yr" , "+4g in 2025"),]
+colnames(N.sim.80.3050)<- her.breaks
+rownames(N.sim.80.3050)<- bias.breaks
+N.sim.80.3050=N.sim.80.3050[c("Male","Historical", "Pup", "Adult","Female"),c("Mean of historical" ,        "-0.2g/yr",   "-4g in 2025"  , "+0.2g/yr" , "+4g in 2025")]
+colnames(N.sim.80.3600)<- her.breaks
+rownames(N.sim.80.3600)<- bias.breaks
+N.sim.80.3600=N.sim.80.3600[c("Male","Historical", "Pup", "Adult","Female"),c("Mean of historical" ,        "-0.2g/yr",   "-4g in 2025"  , "+0.2g/yr" , "+4g in 2025")]
+colnames(N.sim.80.4800)<- her.breaks
+rownames(N.sim.80.4800)<- bias.breaks
+
+N.sim.80.4800=N.sim.80.4800[c("Male","Historical", "Pup", "Adult","Female"),c("Mean of historical" ,        "-0.2g/yr",   "-4g in 2025"  , "+0.2g/yr" , "+4g in 2025")]
 #Set up values for plotting
 
+# scenario.colors <- c('Historical'='black', 
+#                      '0'='red', 
+#                      "1311"="cyan3",
+#                      '2400'='blue', 
+#                      "3050"="magenta",
+#                      '3600'='orange', 
+#                      '4800'='green3'
+#                      )
 scenario.colors <- c('Historical'='black', 
-                     '0'='red', 
-                     '2400'='blue', 
-                     '3600'='orange', 
-                     '4800'='green3',
-                     "1311"="cyan3",
-                     "3050"="magenta"
+                     '0'='#E69F00', 
+                     "1311"="#56B4E9",
+                     '2400'= '#CC79A7',#'#009E73', 
+                     "3050"='#009E73',#'#0072B2', #'#D55E00',
+                     '3600'= '#D55E00',# '#0072B2', 
+                     '4800'="#F0E442"
                      )
+
 
 bias.linetype<- c("Historical"=1,
             "Pup"=2,
@@ -243,7 +270,7 @@ df.age.str$Scenario="Historical"
 
 p=ggplot(rbind( df.age.str.sim,df.age.str),aes(x=year, y=ratio, group=GenderAge, fill=GenderAge)) + 
   geom_area(col="black", linewidth=0.3)  +  labs(x = 'Year', y='Relative frequency')+
-  scale_fill_manual(values=C,name='Gender and Age') +   
+  scale_fill_manual(values=C,name='Sex and Age') +   
   geom_vline(aes(xintercept=2025), linetype='dotted',linewidth=1,  col="black") +
   scale_alpha_manual(values=c(1, 0.5), name="")+ theme_classic(base_size = font_size)
 p
@@ -277,9 +304,34 @@ for ( i in 1:6){
 N.full.hunt.bias=N.full.hunt[N.full.hunt$Herring_quality %in% c("Historical", "Mean of historical"),]
 N.full.hunt.bias$group=paste(N.full.hunt.bias$Scenario, N.full.hunt.bias$Hunting_bias)
 
-
 last.year=years.sim[length(years.sim)]
 ymax=220000
+
+
+
+p=ggplot(N.full.hunt.bias, aes(x=year, group=group,alpha=Hunting_bias,fill=Scenario,linetype = Hunting_bias)) +
+  geom_line(aes(y=md, color=Scenario), alpha=1,linewidth=0.4)+
+  geom_ribbon(aes(ymin=lb, ymax=ub),linetype=1) +
+  
+  scale_fill_manual("", values=scenario.colors, breaks=scenario.breaks, guide="none") +
+  scale_linetype_manual("Hunting bias", values=bias.linetype, breaks=bias.breaks) +
+  scale_color_manual("Hunted Seals", values=scenario.colors, breaks=scenario.breaks) +
+  scale_alpha_manual( values=bias.alpha, breaks=bias.breaks, guide="none") +
+  
+  scale_x_continuous(breaks=seq(2000,2100,10)) +
+  scale_y_continuous(limits = c(0,ymax)) +
+  labs(x='Year', y='Total population size') +
+  theme_classic()+
+  theme(legend.position = c(0.1,0.6), text = element_text(size=10),legend.background = element_rect(fill="transparent" ,colour = "transparent"))
+ 
+
+
+ggsave(filename= paste(figure_folder, "pop_size_sim_bias_traj.png",sep=""),
+      plot=p,   width=8, height=5)
+
+```
+
+```{r}
 
 breaks=c(-20000,100,20000,40000,60000,80000,100000,120000,140000, 160000,180000,200000, 220000)
 
@@ -289,11 +341,11 @@ X=(breaks[1:(length(breaks)-1)]+breaks[2:(length(breaks))])/2
 plot=list()
 
 col=c("red","cyan3", "blue",rep("orange",5),  "green3")
-T=c(scenario.breaks[2:4], paste(scenario.breaks[5], bias.breaks, sep="\n") , scenario.breaks[6])
+col=c( '#E69F00', "#56B4E9",'#CC79A7','#009E73',rep('#D55E00',5),"#F0E442")
+
+T=c(scenario.breaks[2:5], paste(scenario.breaks[6], bias.breaks, sep="\n") , scenario.breaks[7])
 ax_lab.size=8
 lab.size=3
-
-
 for ( j in 1:length(B.list)){
   dat=as.numeric(N.sim.80.bias[j,])
   P={}
@@ -318,7 +370,6 @@ for ( j in 1:length(B.list)){
         y=max(ggplot_build(ggplot()+geom_histogram(aes(x=dat,y= ..density..), breaks=breaks))$data[[1]]$y)/2
         p1 <-   ggplot() +
   geom_histogram(aes(x =dat,y= ..density..),fill = col[j] , alpha=0.4,col="white", breaks=breaks)+
- # geom_density(aes(x =dat), fill=col[j], alpha=0.1, col="white",adjust=1/2)+
   geom_text(aes(x=(breaks[1:(length(breaks)-1)]+breaks[2:(length(breaks))])/2,label =P,y =y), size=lab.size)+
   coord_flip() +
   theme_classic() +
@@ -328,61 +379,51 @@ for ( j in 1:length(B.list)){
   labs(x="",y="")+
            ggtitle(T[j])+
   theme(legend.position = c(-9,0.2), text = element_text(size=ax_lab.size))+
-  scale_fill_identity(name='Carrying capacity', guide='none')+
   theme(plot.margin = margin(t = 10, b = 10, l = 0, r = 10)  )+
               theme(plot.title = element_text(hjust =0.2, vjust=-5))
         print(p1)
     })
-  
-  
 }
 
 p2= 
   plot[[1]]+ theme(plot.title = element_text(hjust =0.2, vjust=0))+
   plot[[2]]+  theme(plot.title = element_text(hjust =0.2, vjust=0))+
   plot[[3]]+ theme(plot.title = element_text(hjust =0.2, vjust=0))+
-  plot[[4]]+theme(plot.title = element_text(hjust =0.2, vjust=-4))+
+  plot[[4]]+theme(plot.title = element_text(hjust =0.2, vjust=0))+
   plot[[5]]+ theme(plot.title = element_text(hjust =0.2, vjust=-4))+
   plot[[6]]+ theme(plot.title = element_text(hjust =0.2, vjust=-4))+
   plot[[7]]+ theme(plot.title = element_text(hjust =0.2, vjust=-4))+
   plot[[8]]+ theme(plot.title = element_text(hjust =0.2, vjust=-4))+
 
-    plot[[9]]+  theme(plot.title = element_text(hjust =0.2, vjust=0))+
-    plot_layout(widths =  rep(1,9))
+    plot[[9]]+  theme(plot.title = element_text(hjust =0.2, vjust=-4))+
+    plot[[10]]+  theme(plot.title = element_text(hjust =0.2, vjust=0))+
+    plot_layout(widths =  rep(1,10))
  
 
-p=ggplot(N.full.hunt.bias, aes(x=year, group=group,alpha=Hunting_bias,fill=Scenario,linetype = Hunting_bias)) +
-  geom_line(aes(y=md, color=Scenario), alpha=1,linewidth=0.4)+
-  geom_ribbon(aes(ymin=lb, ymax=ub),linetype=1) +
-  
-  scale_fill_manual("", values=scenario.colors, breaks=scenario.breaks, guide="none") +
-  scale_linetype_manual("Hunting bias", values=bias.linetype, breaks=bias.breaks) +
-  scale_color_manual("Hunted Seals", values=scenario.colors, breaks=scenario.breaks) +
-  scale_alpha_manual( values=bias.alpha, breaks=bias.breaks, guide="none") +
-  
-  scale_x_continuous(breaks=seq(2000,2100,10)) +
-  scale_y_continuous(limits = c(0,ymax)) +
-  labs(x='Year', y='Total population size') +
-  theme_classic()+
-  theme(legend.position = c(0.1,0.6), text = element_text(size=10),legend.background = element_rect(fill="transparent" ,colour = "transparent"))
-  #ggtitle("Population trajectories")+
- p2+
-
-    plot_layout(widths = c(10,10))
-p
-
-ggsave(filename= paste(figure_folder, "pop_size_sim_bias_traj.png",sep=""),
-      plot=p,   width=8, height=5)
 
 
 ggsave(filename= paste(figure_folder, "pop_size_sim_bias_2080.png",sep=""),
       plot=p2,   width=8, height=5)
+
+p2
 
 ```
 
 #### Report expected final pop size & surviva probability
 
 ```{r}
+sc=2400
+round(N.full.hunt.bias[N.full.hunt.bias$Scenario==sc & N.full.hunt.bias$year==2080,"lb"])
+round(N.full.hunt.bias[N.full.hunt.bias$Scenario==sc & N.full.hunt.bias$year==2080,"md"])
+round(N.full.hunt.bias[N.full.hunt.bias$Scenario==sc & N.full.hunt.bias$year==2080,"ub"])
+
+
+sc=3050
+round(N.full.hunt.bias[N.full.hunt.bias$Scenario==sc & N.full.hunt.bias$year==2080,"lb"])
+round(N.full.hunt.bias[N.full.hunt.bias$Scenario==sc & N.full.hunt.bias$year==2080,"md"])
+round(N.full.hunt.bias[N.full.hunt.bias$Scenario==sc & N.full.hunt.bias$year==2080,"ub"])
+
+
 sc=3600
 round(N.full.hunt.bias[N.full.hunt.bias$Scenario==sc & N.full.hunt.bias$year==2080,"lb"])
 round(N.full.hunt.bias[N.full.hunt.bias$Scenario==sc & N.full.hunt.bias$year==2080,"md"])
@@ -393,33 +434,56 @@ B.list
 ```
 
 
-### Herring quality (Figure 4A)
+### Herring WAA (Figure 4A)
 ```{r}
 N.full.hunt.her=N.full.hunt[N.full.hunt$Hunting_bias=="Historical",]
 
 N.full.hunt.her$group=paste(N.full.hunt.her$Scenario, N.full.hunt.her$Herring_quality)
 
 
-last.year=years.sim[length(years.sim)]
-ymax=230000
 ymax=210000
 
 
-breaks=c(-3000,2000,60000,80000,100000,120000,140000, 160000, 210000)
 
-breaks.plot=c(0,60000,80000,100000,120000,140000, 160000, 210000)
+p=ggplot(N.full.hunt.her, aes(x=year, group=group,alpha=Herring_quality,fill=Scenario,linetype = Herring_quality)) +
+  geom_line(aes(y=md, color=Scenario), alpha=1,linewidth=0.4)+
+  geom_ribbon(aes(ymin=lb, ymax=ub),linetype=1) +
+  
+  scale_fill_manual("", values=scenario.colors, breaks=scenario.breaks, guide="none") +
+  scale_linetype_manual("Herring WAA", values=her.linetype, breaks=her.breaks) +
+  scale_color_manual("Hunted Seals", values=scenario.colors, breaks=scenario.breaks) +
+  scale_alpha_manual( values=her.alpha, breaks=her.breaks, guide="none") +
+  
+  scale_x_continuous(breaks=seq(2000,2100,10)) +
+  scale_y_continuous(limits = c(0,ymax)) +
+  labs(x='Year', y='Total population size') +
+  theme_classic()+
+   # ggtitle("Population size in 2080 with 3600 hunted seals")+
+
+  theme(legend.position = c(0.1,0.6), text = element_text(size=10),legend.background = element_rect(fill="transparent" ,colour = "transparent"))
+
+ggsave(filename= paste(figure_folder, "pop_size_sim_her_traj.png",sep=""),
+      plot=p,   width=8,      , height=5)
+
+
+```
+
+```{r}
+
+last.year=years.sim[length(years.sim)]
+breaks=c(-20000,100,20000,40000,60000,80000,100000,120000,140000, 160000,180000,200000, 220000)
+breaks.plot=c(100,60000,80000,100000,120000,140000, 160000, 210000)
+
 X=(breaks[1:(length(breaks)-1)]+breaks[2:(length(breaks))])/2
 
 plot=list()
-her.breaks.short=c("Mean of hist.",
-            "+0.2g/yr",
-            "-0.2g/yr",
-            "+4g in 2025",
-            "-4g in 2025")
+her.breaks.short=c("Mean of historical" , 
+                   "-0.2g/yr", 
+                   "-4g in 2025",
+                   "+0.2g/yr",
+                   "+4g in 2025")
 
-col=rep("orange",5)
-# T=c(scenario.breaks[2:4], paste(scenario.breaks[5], her.breaks.short, sep="\n") , scenario.breaks[6])
-
+col=rep('#D55E00',5)
 T=c( her.breaks.short)
 
 ax_lab.size=4
@@ -448,19 +512,19 @@ for ( j in 1:length(H.list)){
         P<-P
         x_ax<-x_ax
         y=max(ggplot_build(ggplot()+geom_histogram(aes(x=dat,y= ..density..), breaks=breaks))$data[[1]]$y)/2
+       
         p1 <-   ggplot() +
   geom_histogram(aes(x =dat,y= ..density..),fill = col[j] , alpha=0.4,col="white", breaks=breaks)+
-  #geom_density(aes(x =dat), fill=col[j], alpha=0.1, col="white",adjust=1/2)+
   geom_text(aes(x=(breaks[1:(length(breaks)-1)]+breaks[2:(length(breaks))])/2,label =P,y =y), size=2)+
   coord_flip() +
   theme_classic() +
  
-  scale_x_continuous(breaks=x_ax,limits=c(-3000,ymax)) +
-  scale_y_continuous(breaks=c(), limit= c(0,y*2)) +
+  scale_x_continuous(breaks=x_ax,limits=c(-20000,ymax)) +
+  scale_y_continuous(breaks=c())+
+        #, limit= c(0,y*2)) +
   labs(x="",y="")+
            ggtitle(T[j])+
   theme(legend.position = c(-9,0.2), text = element_text(size=5))+
-  scale_fill_identity(name='Carrying capacity', guide='none')+
   theme(plot.margin = margin(t = 10, b = 10, l = 0, r = 10)  )+
               theme(plot.title = element_text(hjust =0.6, vjust=-5))
         print(p1)
@@ -476,29 +540,12 @@ p2=
   plot[[4]]+ theme(plot.title = element_text(hjust =0.5, vjust=-2))+
   plot[[5]]+ theme(plot.title = element_text(hjust =0.5, vjust=-2))+
 
-      plot_layout(widths =  rep(1,9))
+      plot_layout(widths =  rep(1,5))
  
 
-p=ggplot(N.full.hunt.her, aes(x=year, group=group,alpha=Herring_quality,fill=Scenario,linetype = Herring_quality)) +
-  geom_line(aes(y=md, color=Scenario), alpha=1,linewidth=0.4)+
-  geom_ribbon(aes(ymin=lb, ymax=ub),linetype=1) +
-  
-  scale_fill_manual("", values=scenario.colors, breaks=scenario.breaks, guide="none") +
-  scale_linetype_manual("Herring quality", values=her.linetype, breaks=her.breaks) +
-  scale_color_manual("Hunted Seals", values=scenario.colors, breaks=scenario.breaks) +
-  scale_alpha_manual( values=her.alpha, breaks=her.breaks, guide="none") +
-  
-  scale_x_continuous(breaks=seq(2000,2100,10)) +
-  scale_y_continuous(limits = c(0,ymax)) +
-  labs(x='Year', y='Total population size') +
-  theme_classic()+
-    ggtitle("Population size in 2080 with 3600 hunted seals")+
 
-  theme(legend.position = c(0.1,0.6), text = element_text(size=10),legend.background = element_rect(fill="transparent" ,colour = "transparent"))+  
-  p2+
-    plot_layout(widths = c(10,5.55))
-ggsave(filename= paste(figure_folder, "pop_size_sim_hers.png",sep=""),
-      plot=p,   width=12.44, height=5)
+ggsave(filename= paste(figure_folder, "pop_size_sim_her_2080.png",sep=""),
+      plot=p2,   width=4, height=5)
 p
 ```
 
@@ -525,9 +572,21 @@ N.full.hunt.her[N.full.hunt.her$Scenario==sc & N.full.hunt.her$year==2057,"md"]
 
 y=length(years.sim)
 
-colnames(N.sim.80.3600)<- her.breaks
-rownames(N.sim.80.3600)<- bias.breaks
-N.sim.80.3600=N.sim.80.3600[c("Male","Historical", "Pup", "Adult","Female"),c("Mean of historical" ,        "-0.2g/yr",   "-4g in 2025"  , "+0.2g/yr" , "+4g in 2025")]
+p=pheatmap((round(N.sim.80.3050)), treeheight_col = 0,treeheight_row = 0, display_numbers = 100-round((N.sim.80.3050)),
+           show_colnames = FALSE,
+           cluster_rows = FALSE,
+           cluster_cols = FALSE,
+          legend = TRUE,
+          fontsize = 15,
+          number_color = "white" , border_color = "white", color = 
+           colorRampPalette(c("red", "gold3", "navy"))(100),
+           #hcl.colors(100, "RdYlBu"),
+           breaks=seq(from=100, to=0, length=100), main="3050")
+
+ggsave(filename= paste(figure_folder, "surv_prob_3050.png",sep=""),
+      plot=p,   width=4.2, height=1.8)
+
+
 p=pheatmap((round(N.sim.80.3600)), treeheight_col = 0,treeheight_row = 0, display_numbers = 100-round((N.sim.80.3600)),
            show_colnames = FALSE,
            cluster_rows = FALSE,
@@ -540,12 +599,8 @@ p=pheatmap((round(N.sim.80.3600)), treeheight_col = 0,treeheight_row = 0, displa
            breaks=seq(from=100, to=0, length=100), main="3600")
 
 ggsave(filename= paste(figure_folder, "surv_prob_3600.png",sep=""),
-      plot=p,   width=4.2, height=2.8)
+      plot=p,   width=4.2, height=2.2) #2.8
 
-colnames(N.sim.80.4800)<- her.breaks
-rownames(N.sim.80.4800)<- bias.breaks
-
-N.sim.80.4800=N.sim.80.4800[c("Male","Historical", "Pup", "Adult","Female"),c("Mean of historical" ,        "-0.2g/yr",   "-4g in 2025"  , "+0.2g/yr" , "+4g in 2025")]
 p=pheatmap((round(N.sim.80.4800)), treeheight_col = 0,treeheight_row = 0, display_numbers = 100-round((N.sim.80.4800)),
            show_colnames = TRUE, 
             fontsize = 15,
@@ -554,10 +609,10 @@ p=pheatmap((round(N.sim.80.4800)), treeheight_col = 0,treeheight_row = 0, displa
           number_color = "white" , border_color = "white", color = 
            colorRampPalette(c("red", "gold3", "navy"))(100),
            #hcl.colors(100, "RdYlBu"),
-           breaks=seq(from=0, to=100, length=100), main="4800")
+           breaks=seq(from=100, to=0, length=100), main="4800")
 p
 ggsave(filename= paste(figure_folder, "surv_prob_4800.png",sep=""),
-      plot=p,   width=4.2, height=4)
+      plot=p,   width=4.2, height=3.5)
 
 ```
 
@@ -631,7 +686,7 @@ ggsave(filename= paste(figure_folder, "birth_sim_num.png",sep=""),
 ```{r}
 
 N.full.hunt.short=N.full.hunt[N.full.hunt$Herring_quality %in% c("Historical", "Mean of historical") & N.full.hunt$Hunting_bias=="Historical",]
-N.full.hunt.sh$group=paste(N.full.hunt.bias$Scenario, N.full.hunt.bias$Hunting_bias)
+#N.full.hunt.sh$group=paste(N.full.hunt.bias$Scenario, N.full.hunt.bias$Hunting_bias)
 
 
 last.year=years.sim[length(years.sim)]

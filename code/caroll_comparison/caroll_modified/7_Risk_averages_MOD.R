@@ -438,20 +438,19 @@ model.linewidth<- c("Caroll et al. (2024), 120000"=0.8,"Caroll et al. (2024), 10
 model.alpha<- c("Caroll et al. (2024), 120000"=0,"Caroll et al. (2024), 100000"=0, "Caroll et al. (2024), 88000"=0, "This study"=0.07)
 
 scenario.colors <- c('Historical'='black', 
-                     '0'='red', 
-                     '2400'='blue', 
-                     '3600'='orange', 
-                     '4800'='green3',
-                     "1271"="cyan3"
-) #Use same colors as for analysis plots
-
+                     '0'='#E69F00', 
+                     "1311"="#56B4E9",
+                     '2400'= '#CC79A7',#'#009E73', 
+                     "3050"='#009E73',#'#0072B2', #'#D55E00',
+                     '3600'= '#D55E00',# '#0072B2', 
+                     '4800'="#F0E442"
+)
 
 p=ggplot(rbind(Av.melt, N.df), aes(x=year, y=md,  fill=Scenario,  linetype=K, linewidth = K))+
   geom_line(aes(col=Scenario))+
   geom_ribbon(aes(ymin=lb, ymax=ub, alpha=K),linetype=1) +
   labs(y='Population size', x='Year') +
-  xlim(2015,2100)+
-  theme_classic()+
+  xlim(2015,2100)+  theme_classic()+
   scale_linetype_manual("Model & carrying capacity", values=model.linetype, breaks=model.breaks) +
   scale_linewidth_manual("Model & carrying capacity", values=model.linewidth, breaks=model.breaks, guide="none") +
   scale_alpha_manual("", values=model.alpha, breaks=model.breaks, guide="none") +
@@ -463,7 +462,8 @@ p=ggplot(rbind(Av.melt, N.df), aes(x=year, y=md,  fill=Scenario,  linetype=K, li
 p
 
 
-ggsave(filename= paste(figure_folder,"comp_Caroll_sim.png",sep=""),
+ggsave(filename= paste(figure_folder,"comp_Caroll_sim_all
+                       .png",sep=""),
        plot=p,   width=12, height=10)
 
 
@@ -487,9 +487,9 @@ p
 ggsave(filename= paste(figure_folder,"comp_Caroll_sim_0.png",sep=""),
        plot=p,   width=12, height=6)
 
-p=ggplot(df[df$Scenario==2400,], aes(x=year, y=md,   linetype=K, linewidth = K), fill=scenario.colors[3])+
-  geom_line(aes(col=Scenario))+
-  geom_ribbon(aes(ymin=lb, ymax=ub, alpha=K),linetype=1, fill=scenario.colors[3]) +
+p=ggplot(df[df$Scenario==2400,], aes(x=year, y=md,   linetype=K, linewidth = K), fill=scenario.colors[4])+
+  geom_line(col=scenario.colors[4])+
+  geom_ribbon(aes(ymin=lb, ymax=ub, alpha=K),linetype=1, fill=scenario.colors[4]) +
   labs(y='Population size', x='Year') +
   xlim(2015,2100)+
   theme_classic()+
@@ -506,9 +506,9 @@ p
 ggsave(filename= paste(figure_folder,"comp_Caroll_sim_2400.png",sep=""),
        plot=p,   width=12, height=6)
 
-p=ggplot(df[df$Scenario==3600,], aes(x=year, y=md,   linetype=K, linewidth = K), fill=scenario.colors[4])+
-  geom_line(aes(col=Scenario))+
-  geom_ribbon(aes(ymin=lb, ymax=ub, alpha=K),linetype=1, fill=scenario.colors[4]) +
+p=ggplot(df[df$Scenario==3600,], aes(x=year, y=md,   linetype=K, linewidth = K), fill=scenario.colors[6])+
+  geom_line(col=scenario.colors[6])+
+  geom_ribbon(aes(ymin=lb, ymax=ub, alpha=K),linetype=1, fill=scenario.colors[6]) +
   labs(y='Population size', x='Year') +
   xlim(2015,2100)+
   theme_classic()+

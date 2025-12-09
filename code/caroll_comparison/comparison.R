@@ -1,9 +1,8 @@
 ##### Read in ####
 library(rstan)
-home_folder="~/milena/Caroll_comparison/Caroll_modified/"
-source("1_Ordered_scripts_MOD.R", echo = TRUE)
+source(paste(caroll_code_folder,"1_Ordered_scripts_MOD.R", sep=""),echo = TRUE)
+source(paste(code_folder,"readin.R",sep="")) # read in stan fit, samples, observed data
 
-setwd("/home/")
 fit=readRDS("~/milena/grey_seal_stan_fit/fit_long_num.rds")
 
 samples <- rstan::extract(fit, pars=c('N','N_tot',"n0",
@@ -152,13 +151,8 @@ p=ggplot(N_tot.q[N_tot.q$t<80,], aes(x=t,  fill=mod))+geom_line(aes(y=m, col=mod
   theme(legend.position = c(0.6,0.3), text=element_text(size=20))
  
 p
-#ggsave(filename= "/home/milenava/Seals/Grey_seals/Figures/num/comp_pop_size_ci.png",
-       plot=p,   width=8, height=5)
 
-#ggsave(filename= "/home/milenava/Seals/Grey_seals/Figures/num/comp_pop_size_Bci.png",
-       plot=p,   width=8, height=5)
-
-ggsave(filename= "/home/milenava/Seals/Grey_seals/Figures/num/comp_pop_size_fixedK_Bci.png",
+ggsave(filename= paste(figure_folder,"comp_pop_size_fixedK_Bci.png",sep=""),
        plot=p,   width=5, height=5)
 
 #### Growth rate ####
@@ -246,6 +240,7 @@ p2=ggplot(rbind(G1,G2), aes(x=N,  fill=mod))+geom_line(aes(y=m, col=mod))+
 
 p2
 
-ggsave(filename= "/home/milenava/Seals/Grey_seals/Figures/num/comp_growth.png",
+
+ggsave(filename= paste(figure_folder,"comp_growth.png",sep=""),
        plot=p2,   width=5, height=5)
 

@@ -1,5 +1,5 @@
 *code:
-- set_folder.R: RUN FIRST! sets folders containing the code, the data, the Stan fit and the data where the generated plots and simulations are saved. ONLY THIS NEEDS TO BE MODIFIED when code is moved and run before anything else is ran.
+- set_folder.R: RUN FIRST! sets folders containing the code, the data, the Stan fit and the data where the generated plots and simulations are saved. ONLY THIS NEEDS TO BE MODIFIED when code is moved and run before anything else is ran. FOLDER where the Stan model fit is saved NEEDS TO BE CREATED!
 
 - grey_seal.stan: Stan file for population model
 - fit_stan_model.R: reads in data and runs the Stan model, saves the fit. Runs very long.

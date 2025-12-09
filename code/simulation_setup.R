@@ -9,7 +9,7 @@ years.sim.birth=2025:2060
 
 ##### Scenarios ####
 
-scenario.breaks <- c('Historical',"0","1311","2400","3600","4800", "3050")
+scenario.breaks <- c('Historical',"0","1311","2400","3050","3600","4800")
 bias.breaks<- c("Historical","Pup",   "Adult",  "Male", "Female")
 her.breaks<-  c("Mean of historical", "+0.2g/yr", "-0.2g/yr", "+4g in 2025", "-4g in 2025")
 
@@ -19,9 +19,9 @@ Q_fi.scenarios[,1] <- 0 # known Finnish quota for 2023
 Q_fi.scenarios[1,] <- 0
 Q_fi.scenarios[2,] <- y_hb_fi[22]
 Q_fi.scenarios[3,] <- 1200
-Q_fi.scenarios[4,] <- 1800
-Q_fi.scenarios[5,] <- 2400
-Q_fi.scenarios[6,] <- 1550
+Q_fi.scenarios[4,] <- 1550
+Q_fi.scenarios[5,] <- 1800
+Q_fi.scenarios[6,] <- 2400
 
 
 Q_sw.scenarios <- matrix(NA,6 , length(years.sim))
@@ -29,10 +29,9 @@ Q_sw.scenarios[,1] <- 0
 Q_sw.scenarios[1,] <- 0
 Q_sw.scenarios[2,] <- y_hb_sw[23]
 Q_sw.scenarios[3,] <- 1200
-Q_sw.scenarios[4,] <- 1800
-Q_sw.scenarios[5,] <- 2400
-
-Q_sw.scenarios[6,] <- 1500
+Q_sw.scenarios[4,] <- 1500
+Q_sw.scenarios[5,] <- 1800
+Q_sw.scenarios[6,] <- 2400
 
 ##### Bias scenarios ####
 bias_sw=log(colMeans(samples$rho[,1,,3]/apply(samples$rho[,1,,3],1, mean))) #historical bias returned from our model fitting
@@ -86,8 +85,8 @@ h_G.scenarios[5,2:ncol(h_G.scenarios)] <- h_G.scenarios[5,1] - 4/sd_G
 
 ##### Vertical denisty plots #### 
 #These are the "interesting" scenarios plotted separately
-Q.list=c(1,2,3,4,4,4,4,4,5)
-B.list=c(1,1,1,1,2,3,4,5,1)
+Q.list=c(1,2,3,4,5,5,5,5,5,6)
+B.list=c(1,1,1,1,1,2,3,4,5,1)
 
 H.list=c(1,2,3,4,5) #for herring quality scenarios, we only plotted under 3600 harvest size 
 
