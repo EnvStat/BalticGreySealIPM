@@ -58,7 +58,7 @@ df_rep_fi$X<- NULL
 df_rep_fi=df_rep_fi
 Z_fi=as.matrix(df_rep_fi)
 
-#Herring quality (mean weight)
+#Herring WAA (mean weight of herring over the age of five)
 df_h=read.csv("Herring.csv")
 h_BP_GoF=df_h$BP_GoF.norm  #Baltic Proper + Gulf of Finland
 h_GoB=df_h$GoB.norm #Gulf of Bothnia

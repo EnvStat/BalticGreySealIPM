@@ -7,6 +7,7 @@ knitr::opts_chunk$set(echo = TRUE)
 #open set_folders.R and RUN!!!
 
 
+
 source(paste(code_folder,"readin.R",sep="")) # read in stan fit, samples, observed data
 years.sim <- 2025:2080 #Simulated years
 t=23 #Number of years on which the model is run (2003-2025)
@@ -90,12 +91,12 @@ p=ggplot(data=df.B0.q) +
   geom_ribbon(aes(x = H,ymin=lb, ymax=ub), alpha=0.3)+
   
   theme_classic(base_size = font_size) +
-  labs(x="Herring mean weight(g)", y="Birt rate at zero denisty", size=12)+
-  theme(text = element_text(size=font_size))
+  labs(x="", y="", size=12)+
+  theme(text = element_text(size=30))
 p
 
-ggsave(filename= paste(figure_folder, "b0_herring_function.png",sep=""),
-       plot=p,   width=8, height=3)
+ggsave(filename= paste(figure_folder, "b0_herring_function_ga_nolabs.png",sep=""),
+       plot=p,   width=7, height=4)
 ```
 
 
@@ -141,7 +142,7 @@ p=ggplot(rbind(N.past.df, G.df), aes(x=year,fill=Scenario)) +
   theme(legend.position = c(0.3,0.7), text = element_text(size=16),legend.background = element_rect(fill="transparent" ,colour = "transparent"))
 p
 
-ggsave(filename= paste(figure_folder,"pop_size_sim_bias.png",sep=""),
+ggsave(filename= paste(figure_folder,"hist_pop_size_growth.png",sep=""),
       plot=p,   width=8, height=3)
 
 
@@ -340,7 +341,6 @@ X=(breaks[1:(length(breaks)-1)]+breaks[2:(length(breaks))])/2
 
 plot=list()
 
-col=c("red","cyan3", "blue",rep("orange",5),  "green3")
 col=c( '#E69F00', "#56B4E9",'#CC79A7','#009E73',rep('#D55E00',5),"#F0E442")
 
 T=c(scenario.breaks[2:5], paste(scenario.breaks[6], bias.breaks, sep="\n") , scenario.breaks[7])
@@ -760,24 +760,26 @@ p=ggplot(N.full.hunt.short, aes(x=year, group=Scenario,alpha=Hunting_bias,fill=S
   scale_color_manual("Hunted Seals", values=scenario.colors, breaks=scenario.breaks) +
   scale_alpha_manual( values=bias.alpha, breaks=bias.breaks, guide="none") +
   
-  scale_x_continuous(breaks=seq(2000,2100,10)) +
+  scale_x_continuous(breaks=seq(2000,2100,20)) +
   scale_y_continuous(limits = c(0,ymax)) +
-  labs(x='Year', y='Total population size') +
+  labs(x='', y='') +
   theme_classic()+
-  theme(legend.position = c(0.2,0.6), text = element_text(size=20),legend.background = element_rect(fill="transparent" ,colour = "transparent"))+
-  ggtitle("Simulated population trajectories")
+  theme(legend.position = c(0.17,0.6), text = element_text(size=25),legend.background = element_rect(fill="transparent" ,colour = "transparent"))
+ggtitle("Simulated population trajectories")
   
   
-ggsave(filename= paste(figure_folder, "pop_size_sim_ga.png",sep=""),
+ggsave(filename= paste(figure_folder, "pop_size_sim_ga_nolab.png",sep=""),
       plot=p,   width=9, height=5)
 
 ```
 
 
 ```{r}
-p=ggplot()+stat_density(aes(x=samples$K, col="Posterior"),geom="line",position="identity")+stat_density(aes(x=rlnorm(10000, 11.3,0.3), col="Prior"),geom="line",position="identity")+scale_color_manual("",values=c("Prior"="blue", "Posterior"="red"))+theme_classic()+xlab("Carrying capacity")+theme(legend.position = c(0.7,0.5), text = element_text(size=ax_lab.size))
+p=ggplot()+stat_density(aes(x=samples$K, col="Posterior"),linewidth=1, geom="line",position="identity")+stat_density(aes(x=rlnorm(100000, 11.3,0.3), col="Prior"),linewidth=1,geom="line",position="identity")+scale_color_manual("",values=c("Prior"="blue", "Posterior"="red"))+theme_classic()+xlab("")+theme(legend.position = c(0.7,0.5), text = element_text(size=35))+   theme(axis.ticks.y = element_blank(),
+        axis.text.y = element_blank())
 
-ggsave(filename= paste(figure_folder, "Carrying_capacity_posterior_prior.png",sep=""),
+
+ggsave(filename= paste(figure_folder, "Carrying_capacity_posterior_prior_nolab.png",sep=""),
       plot=p,   width=9, height=5)
 
 ```

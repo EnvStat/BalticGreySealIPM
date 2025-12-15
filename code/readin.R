@@ -81,6 +81,8 @@ y_pr_tot=df_pr$Total
 df_rep=read.csv(paste(proc_data_folder,"Reproductive_signs_FI.csv", sep=""))
 Z=as.matrix(df_rep[,2:23])
 
-#Herring quality 
+
+#Herring WAA (mean weight of herring over the age of five)
 df_h=read.csv(paste(proc_data_folder,"Herring.csv", sep=""))
-h_BS=df_h$BS.norm
+h_BP_GoF=df_h$BP_GoF.norm  #Baltic Proper + Gulf of Finland
+h_GoB=df_h$GoB.norm #Gulf of Bothnia
