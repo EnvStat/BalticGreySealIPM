@@ -103,7 +103,7 @@ ggsave(filename= paste(figure_folder, "b0_herring_function_ga_nolabs.png",sep=""
 
 
 
-#Historical population szie and growth rate (Figure 2B)
+#Historical population size and growth rate (Figure 2B)
 
 ```{r}
 
@@ -155,7 +155,7 @@ quantile(rowMeans(G), quantiles) #Average growth rate
 # Simulations
 
 
-## Readin and set
+## Read in and set
 
 ```{r}
 source(paste(code_folder,"simulation_setup.R",sep="")) # read in hunting quota, hunting bias and herring quality scenarios

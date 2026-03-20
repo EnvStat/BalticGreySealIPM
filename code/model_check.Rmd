@@ -26,7 +26,7 @@ ggsave(filename= paste(figure_folder,"post_pred_aerial_count.png",sep=""),plot=p
 
 ```{r}
 
-df=read.csv(paste(proc_data,"Herring.csv", sep=""))
+df=read.csv(paste(proc_data_folder,"Herring.csv", sep=""))
 years=seq(from=2002, to=2024, length=23)
 
 apply(samples$z_sim, c(2,3), quantile, 0.5)
@@ -39,7 +39,7 @@ Z.sim.11=samples$z_sim[,4,]
 Z.sim.PS=Z.sim.10+Z.sim.11
 Z=Z[,1:22]
 Z.sim.CA=Z.sim.01+Z.sim.11
-Z.tot=colSums(Z_fi)
+Z.tot=colSums(Z_fi)   # !!!! Z_fi -> Z?
 Z_CA.sim.q<- apply(t(Z.sim.CA)/Z.tot, 1, quantile, quantiles, na.rm=TRUE)
 Z_PS.sim.q<- apply(t(Z.sim.PS)/Z.tot, 1, quantile, quantiles, na.rm=TRUE)
 

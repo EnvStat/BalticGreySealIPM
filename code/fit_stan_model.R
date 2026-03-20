@@ -1,15 +1,26 @@
+
+# Initial set up
+# ======================
 library(rstan)
+library(extraDistr)
 
 options(mc.cores = parallel::detectCores())
 rstan_options(auto_write=TRUE)
 
-# Set constants
+# Set the folders
+
+# Update this to be the path to your project folder
+project.folder = "/home/jpvanhat/Documents_extended/Projects_data/Baltic_seals/baltic_grey_seals/BalticGreySealIPM"
+source("set_folders.R")
+
+# Set model details 
 year=seq(from=2003, to=2025, length=23) #years data covers
-t=length(year) #number of modelled years
+t=length(year) # number of modelled years
 a=6 #number of age classes (0,1,2,3,4,5+)
 
 
 ##### READ IN DATA ########
+# ======================
 
 setwd(proc_data_folder)
 
