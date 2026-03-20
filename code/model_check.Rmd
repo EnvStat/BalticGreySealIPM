@@ -37,9 +37,9 @@ Z.sim.10=samples$z_sim[,2,]
 Z.sim.01=samples$z_sim[,3,]
 Z.sim.11=samples$z_sim[,4,]
 Z.sim.PS=Z.sim.10+Z.sim.11
-Z=Z[,1:22]
+#Z=Z[,1:22]
 Z.sim.CA=Z.sim.01+Z.sim.11
-Z.tot=colSums(Z_fi)   # !!!! Z_fi -> Z?
+Z.tot=colSums(Z_fi)
 Z_CA.sim.q<- apply(t(Z.sim.CA)/Z.tot, 1, quantile, quantiles, na.rm=TRUE)
 Z_PS.sim.q<- apply(t(Z.sim.PS)/Z.tot, 1, quantile, quantiles, na.rm=TRUE)
 
@@ -83,7 +83,7 @@ p<-ggplot() +
          fill='none')
 
 p
-ggsave(filename= paste(figure_folder,"post_pred_pregCA.png",sep=""),plot=p,   width=7, height=8)
+ggsave(filename= paste(figure_folder,"post_pred_pregCA.png",sep=""), plot=p, width=7, height=8)
 
 ```
 
@@ -123,7 +123,7 @@ breaks=round(seq(min(y_pr_tot[y_pr_tot>0]), max(y_pr_tot), length.out=4))
 
 p
 
-ggsave(filename= "/home/milenava/Seals/Grey_seals/Figures/num/post_pred_preg.png",plot=p,    width=7, height=8)
+ggsave(filename= paste(figure_folder,"post_pred_preg.png"), plot=p, width=7, height=8)
 
 ```
 
