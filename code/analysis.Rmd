@@ -682,7 +682,7 @@ ggsave(filename= paste(figure_folder, "birth_sim_num.png",sep=""),
       plot=p,   width=16, height=8)
 ```
 
-### Hunting fo graphical abstract
+### Hunting for graphical abstract
 ```{r}
 
 N.full.hunt.short=N.full.hunt[N.full.hunt$Herring_quality %in% c("Historical", "Mean of historical") & N.full.hunt$Hunting_bias=="Historical",]

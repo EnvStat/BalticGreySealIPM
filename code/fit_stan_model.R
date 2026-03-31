@@ -11,6 +11,7 @@ rstan_options(auto_write=TRUE)
 
 # Update this to be the path to your project folder
 project.folder = "/home/jpvanhat/Documents_extended/Projects_data/Baltic_seals/baltic_grey_seals/BalticGreySealIPM"
+setwd(paste0(project.folder, "/code"))
 source("set_folders.R")
 
 # Set model details 
@@ -24,7 +25,7 @@ a=6 #number of age classes (0,1,2,3,4,5+)
 
 setwd(proc_data_folder)
 
-#Aeraial count
+#Aerial count
 df_count=read.csv("Aerial_count.csv")
 y=df_count$Total
 y[16]=0 # Stan does not accept NA
@@ -169,8 +170,8 @@ data=list(a=6,t=t,
 setwd(code_folder)
 
 
-stan_model <- stan_model("grey_seal.stan") 
-
+#stan_model <- stan_model("grey_seal.stan") 
+stan_model <- stan_model("grey_seal_priorsense.stan") 
 
 fit <- sampling(stan_model, data = data, iter = 4000, warmup=2000, chains = 4, 
                          init =list(inits(),inits(),inits(),inits()),
@@ -182,3 +183,5 @@ fit <- sampling(stan_model, data = data, iter = 4000, warmup=2000, chains = 4,
 setwd(stan_fit_folder)
 
 saveRDS(fit,"grey_seal_fit.rds")
+
+setwd(code_folder)
