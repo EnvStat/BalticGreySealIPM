@@ -1,13 +1,14 @@
 * code:
-- set_folder.R: RUN FIRST! sets folders containing the code, the data, the Stan fit and the data where the generated plots and simulations are saved. ONLY THIS NEEDS TO BE MODIFIED when code is moved and run before anything else is ran. FOLDER where the Stan model fit is saved NEEDS TO BE CREATED!
-
+- set_folder.R: Sets folders containing the code, the data, the Stan fit and the data where the generated plots and simulations are saved. ONLY THIS NEEDS TO BE MODIFIED when code is moved. FOLDER where the Stan model fit is saved NEEDS TO BE CREATED!
 - grey_seal.stan: Stan file for population model
-- fit_stan_model.R: reads in data and runs the Stan model, saves the fit. Runs very long.
+
+  RUNNING THE CODE
+- fit_stan_model.R: START from this and continue in the below order. Reads in data and runs the Stan model, saves the fit. Runs very long.
 
 - readin.R: reads in the Stan fit, extracts the samples, reads in the observed data. Set the folder where plots are saved.
 - plotting_functions.R: helper function for plotting pretty plots
 - forecast_function.R: has the simulate() function, which runs the simulation and the simulate_growth() function needed for comparison to Caroll
-- simulation_setup.R: sets the scenarios for the simulation (harvest size, biases, herring quality) and for how many years to run the simulation
+- simulation_setup.R: sets the scenarios for the simulation (harvest size, hunting selectivity (called bias in the code), herring quality) and for how many years to run the simulation
 - simulation.R: runs the simulation, with the setup of the above. Takes LONG to run. saves in a csv file the median and 95%CI of simulated total population sizes & birth rates over the years + the whole sample for year 2080 + composition for (historical bias+historical herring quality+1311harvest) scenario. -> used then by analysis.Rmd for plotting
 
 - analysis.Rmd: this produces all of the analysis/results of the manuscript (excluding appendix)

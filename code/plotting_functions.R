@@ -1,3 +1,6 @@
+# Note, in the code we use "bias" to denote hunting selectivity. The latter term 
+# is used in the paper. The difference between the paper and code arises from 
+# the reason that we used the less good "bias" in the original submission.
 
 error_bars <- function(quantiles, x_data=NULL, y_data=NULL, x_ticks=NULL, alpha=0.5, shape=1, cex=1, main='', xlab='Time', ylab='Value') {
   if(is.null(x_ticks)) {x_ticks = 1:nrow(quantiles)}

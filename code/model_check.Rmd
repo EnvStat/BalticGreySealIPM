@@ -9,6 +9,13 @@ source(paste(code_folder,"plotting_functions.R",sep="")) # read in stan fit, sam
 
 ```
 
+### Terminology disclaimer
+
+Note, in the code we use "bias" to denote hunting selectivity. The latter term 
+is used in the paper. The difference between the paper and code arises from 
+the reason that we used the less good "bias" in the original submission.
+
+
 
 ### Aerial count
 
@@ -170,6 +177,218 @@ ggsave(filename= paste(figure_folder,"post_pred_FI_hb.png",sep=""),plot=p,   wid
 
 # Prior sensitivity analysis
 
+
+```{r}
+
+# priors 
+prior.list = list(
+  variable = c("n0", "phi_a_sc", "v0_and_v5", "hunting_and_bycatch_bias", "hunting_effort_sd", "herring_effect", "K", "mu"), 
+  index = c(1:8))
+lik.list = list(
+  data = c("Aerial_observations", "Hunting_bag_sw", "Hunting_bag_fi", "hunting_sample_sw", "hunting_sample_fi", "bycatch_samples", "pregnancy_samples", "reproductive_signs"), 
+  index = c(1:8))
+
+# Global sensitivity
+powerscale_sensitivity(fit, variable = c("n0", "K", "phi_a_sc", "v0", "v5", "alpha_sc", "beta", "mu"))
+
+# per parameter prior sensitivity
+# -------------------------------
+# n0 and K
+p.dens <- powerscale_plot_dens(fit, variable = "n0", prior_selection = 1) +
+  ggdist::stat_halfeye(
+    aes(xdist = dist),
+    inherit.aes = FALSE,
+    slab_alpha=0.5,
+    interval_color = "grey",
+    point_color =  "grey",
+    limits = quantile(as.matrix(fit, par="n0"), p = c(0.01,0.99)),
+    data = data.frame(dist = distributional::dist_lognormal(9.8, 0.1))
+  )
+# K
+p.dens2 = powerscale_plot_dens(fit, variable = c("K"), prior_selection = 7) +
+  ggdist::stat_halfeye(
+    aes(xdist = dist),
+    inherit.aes = FALSE,
+    slab_alpha=0.5,
+    interval_color = "grey",
+    point_color =  "grey",
+    limits = quantile(as.matrix(fit, par="K"), p = c(0.01,0.99)),
+    data = data.frame(dist = distributional::dist_lognormal(11.3,0.3))
+  )
+
+p = p.dens + p.dens2
+ggsave(filename= paste(figure_folder,"prior_sens_n0_K.png",sep=""),plot=p,   width=18, height=8)
+
+
+# phi_a and phi_pup
+p.dens = powerscale_plot_dens(fit, variable = c("phi_a"), prior_selection = 2) +
+  ggdist::stat_halfeye(
+    aes(xdist = dist),
+    inherit.aes = FALSE,
+    slab_alpha=0.5,
+    interval_color = "grey",
+    point_color =  "grey",
+    data = data.frame(dist = distributional::dist_uniform(min = 0.8, max=1))
+  )
+# phi_pup
+p.dens2 = powerscale_plot_dens(fit, variable = c("phi_pup"), prior_selection = 2) +
+  ggdist::stat_halfeye(
+    aes(x = samples),
+    inherit.aes = FALSE,
+    slab_alpha=0.5,
+    interval_color = "grey",
+    point_color =  "grey",
+    limits = quantile(as.matrix(fit, par="phi_pup"), p = c(0.01,0.99)),
+    data = data.frame(samples = runif(n = 10000, min=0.8, max=1)*runif(n=10000,min=0, max=1))
+  )
+
+p = p.dens + p.dens2
+ggsave(filename= paste(figure_folder,"prior_sens_phi_a_phi_pup.png",sep=""),plot=p,   width=18, height=8)
+
+
+# v0 and v5
+p.dens = powerscale_plot_dens(fit, variable = c("v0"), prior_selection = 3) +
+  ggdist::stat_halfeye(
+    aes(xdist = dist),
+    inherit.aes = FALSE,
+    slab_alpha=0.5,
+    interval_color = "grey",
+    point_color =  "grey",
+    p_limits = quantile(as.matrix(fit, par="v0"), p = c(0.01,0.99)),
+    data = data.frame(dist = distributional::dist_cauchy(0,0.2))
+  )
+# v5
+p.dens2 = powerscale_plot_dens(fit, variable = c("v5"), prior_selection = 3)+
+  ggdist::stat_halfeye(
+    aes(xdist = dist),
+    inherit.aes = FALSE,
+    slab_alpha=0.5,
+    interval_color = "grey",
+    point_color =  "grey",
+    p_limits = quantile(as.matrix(fit, par="v5"), p = c(0.01,0.99)),
+    data = data.frame(dist = distributional::dist_cauchy(0.88,0.2))
+  )
+
+p = p.dens + p.dens2
+ggsave(filename= paste(figure_folder,"prior_sens_v0_v5.png",sep=""),plot=p,   width=18, height=8)
+
+
+# b0max and b0min
+p.dens = powerscale_plot_dens(fit, variable = c("b0max"), prior_selection = 6) +
+  ggdist::stat_halfeye(
+    aes(xdist = dist),
+    inherit.aes = FALSE,
+    slab_alpha=0.5,
+    interval_color = "grey",
+    point_color =  "grey",
+    #p_limits = quantile(as.matrix(fit, par="b0max"), p = c(0.01,0.99)),
+    data = data.frame(dist = distributional::dist_uniform(0,1))
+  )
+# b0min
+p.dens2 = powerscale_plot_dens(fit, variable = c("b0min"), prior_selection = 6) +
+  ggdist::stat_halfeye(
+    aes(x = samples),
+    inherit.aes = FALSE,
+    slab_alpha=0.5,
+    interval_color = "grey",
+    point_color =  "grey",
+    p_limits = quantile(as.matrix(fit, par="b0min"), p = c(0.01,0.99)),
+    data = data.frame(samples = runif(n = 10000, min=0, max=1)*runif(n=10000,min=0, max=1))
+  )
+
+p = p.dens + p.dens2
+ggsave(filename= paste(figure_folder,"prior_sens_b0max_b0min.png",sep=""),plot=p,   width=18, height=8)
+
+
+# beta and alpha_sc
+p.dens = powerscale_plot_dens(fit, variable = c("beta"), prior_selection = 6) +
+  ggdist::stat_halfeye(
+    aes(xdist = dist),
+    inherit.aes = FALSE,
+    slab_alpha=0.5,
+    interval_color = "grey",
+    point_color =  "grey",
+    p_limits = quantile(as.matrix(fit, par="beta"), p = c(0.01,0.99)),
+    data = data.frame(dist = distributional::dist_normal(0,3))
+  )
+# alpha_sc
+p.dens2 = powerscale_plot_dens(fit, variable = c("alpha"), prior_selection = 6) +
+  ggdist::stat_halfeye(
+    aes(x = samples),
+    inherit.aes = FALSE,
+    slab_alpha=0.5,
+    interval_color = "grey",
+    point_color =  "grey",
+    p_limits = quantile(as.matrix(fit, par="alpha"), p = c(0.01,0.99)),
+    data = data.frame(samples = rnorm(n = 10000, mean = 0, sd=sqrt(4))*rnorm(n = 10000, mean = 0, sd=sqrt(3)))
+  )
+
+p = p.dens + p.dens2
+ggsave(filename= paste(figure_folder,"prior_sens_beta_alpha.png",sep=""),plot=p,   width=18, height=8)
+
+
+# w and mu
+p.dens = powerscale_plot_dens(fit, variable = c("w"), prior_selection = 8) +
+  ggdist::stat_halfeye(
+    aes(xdist = dist),
+    inherit.aes = FALSE,
+    slab_alpha=0.5,
+    interval_color = "grey",
+    point_color =  "grey",
+    #p_limits = quantile(as.matrix(fit, par="b0max"), p = c(0.01,0.99)),
+    data = data.frame(dist = distributional::dist_uniform(0,1))
+  )
+# mu
+p.dens2 = powerscale_plot_dens(fit, variable = c("mu"), prior_selection = 8) +
+  ggdist::stat_halfeye(
+    aes(xdist = dist),
+    inherit.aes = FALSE,
+    slab_alpha=0.5,
+    interval_color = "grey",
+    point_color =  "grey",
+    #p_limits = quantile(as.matrix(fit, par="b0max"), p = c(0.01,0.99)),
+    data = data.frame(dist = distributional::dist_beta(32,9))
+  )
+
+p = p.dens + p.dens2
+ggsave(filename= paste(figure_folder,"prior_sens_w_mu.png",sep=""),plot=p,   width=18, height=8)
+
+
+
+
+
+
+
+
+
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Prior sensitivity analysis with CDFs
 ```{r}
 
 # priors 
@@ -187,7 +406,18 @@ powerscale_sensitivity(fit, variable = c("n0", "K", "phi_a_sc", "v0", "v5", "alp
 # -------------------------------
 # n0
 #powerscale_sensitivity(fit, variable = c("n0"), prior_selection = 1)
-p.dens = powerscale_plot_dens(fit, variable = c("n0"), prior_selection = 1)
+#p.dens = powerscale_plot_dens(fit, variable = c("n0"), prior_selection = 1)
+#p.dens <- powerscale_plot_dens(fit, component = "prior", variable = "n0") +
+p.dens <- powerscale_plot_dens(fit, variable = "n0", prior_selection = 1) +
+  ggdist::stat_halfeye(
+    aes(xdist = dist),
+    inherit.aes = FALSE,
+    slab_alpha=0.5,
+    interval_color = "grey",
+    point_color =  "grey",
+    p_limits = quantile(as.matrix(fit, par="n0"), p = c(0.01,0.99)),
+    data = data.frame(dist = distributional::dist_lognormal(9.8, 0.1))
+  )
 p.ecdf = powerscale_plot_ecdf(fit, variable = c("n0"), prior_selection = 1)
 #p.quant = powerscale_plot_quantities(fit, variable = c("n0"), prior_selection = 1)
 
@@ -197,18 +427,36 @@ ggsave(filename= paste(figure_folder,"prior_sens_n0.png",sep=""),plot=p,   width
 
 # phi_a_sc
 #powerscale_sensitivity(fit, variable = c("phi_a_sc"), prior_selection = 2)
-p.dens = powerscale_plot_dens(fit, variable = c("phi_a_sc"), prior_selection = 2)
-p.ecdf = powerscale_plot_ecdf(fit, variable = c("phi_a_sc"), prior_selection = 2)
+p.dens = powerscale_plot_dens(fit, variable = c("phi_a"), prior_selection = 2) +
+  ggdist::stat_halfeye(
+    aes(xdist = dist),
+    inherit.aes = FALSE,
+    slab_alpha=0.5,
+    interval_color = "grey",
+    point_color =  "grey",
+    data = data.frame(dist = distributional::dist_uniform(min = 0.8, max=1))
+  )
+
+p.ecdf = powerscale_plot_ecdf(fit, variable = c("phi_a"), prior_selection = 2)
 #p.quant = powerscale_plot_quantities(fit, variable = c("phi_a_sc"), prior_selection = 2)
 
 p = p.dens + p.ecdf
 p
-ggsave(filename= paste(figure_folder,"prior_sens_phi_a_sc.png",sep=""),plot=p,   width=18, height=8)
+ggsave(filename= paste(figure_folder,"prior_sens_phi_a.png",sep=""),plot=p,   width=18, height=8)
 
 
 # v0
 #powerscale_sensitivity(fit, variable = c("v0"), prior_selection = 3)
-p.dens = powerscale_plot_dens(fit, variable = c("v0"), prior_selection = 3)
+p.dens = powerscale_plot_dens(fit, variable = c("v0"), prior_selection = 3) +
+  ggdist::stat_halfeye(
+    aes(xdist = dist),
+    inherit.aes = FALSE,
+    slab_alpha=0.5,
+    interval_color = "grey",
+    point_color =  "grey",
+    p_limits = quantile(as.matrix(fit, par="v0"), p = c(0.01,0.99)),
+    data = data.frame(dist = distributional::dist_cauchy(0,0.2))
+  )
 p.ecdf = powerscale_plot_ecdf(fit, variable = c("v0"), prior_selection = 3)
 #p.quant = powerscale_plot_quantities(fit, variable = c("v0"), prior_selection = 3)
 
@@ -218,7 +466,16 @@ ggsave(filename= paste(figure_folder,"prior_sens_v0.png",sep=""),plot=p,   width
 
 # v5
 #powerscale_sensitivity(fit, variable = c("v5), prior_selection = 3)
-p.dens = powerscale_plot_dens(fit, variable = c("v5"), prior_selection = 3)
+p.dens = powerscale_plot_dens(fit, variable = c("v5"), prior_selection = 3)+
+  ggdist::stat_halfeye(
+    aes(xdist = dist),
+    inherit.aes = FALSE,
+    slab_alpha=0.5,
+    interval_color = "grey",
+    point_color =  "grey",
+    p_limits = quantile(as.matrix(fit, par="v5"), p = c(0.01,0.99)),
+    data = data.frame(dist = distributional::dist_cauchy(0.88,0.2))
+  )
 p.ecdf = powerscale_plot_ecdf(fit, variable = c("v5"), prior_selection = 3)
 #p.quant = powerscale_plot_quantities(fit, variable = c("v5"), prior_selection = 3)
 
@@ -226,9 +483,19 @@ p = p.dens + p.ecdf
 p
 ggsave(filename= paste(figure_folder,"prior_sens_v5.png",sep=""),plot=p,   width=18, height=8)
 
+
 # alpha_sc
 #powerscale_sensitivity(fit, variable = c("alpha_sc"), prior_selection = 6)
-p.dens = powerscale_plot_dens(fit, variable = c("alpha_sc"), prior_selection = 6)
+p.dens = powerscale_plot_dens(fit, variable = c("alpha_sc"), prior_selection = 6)+
+  ggdist::stat_halfeye(
+    aes(xdist = dist),
+    inherit.aes = FALSE,
+    slab_alpha=0.5,
+    interval_color = "grey",
+    point_color =  "grey",
+    p_limits = quantile(as.matrix(fit, par="alpha_sc"), p = c(0.01,0.99)),
+    data = data.frame(dist = distributional::dist_normal(0,4))
+  )
 p.ecdf = powerscale_plot_ecdf(fit, variable = c("alpha_sc"), prior_selection = 6)
 #p.alpha.quant = powerscale_plot_quantities(fit, variable = c("beta"), prior_selection = 6)
 

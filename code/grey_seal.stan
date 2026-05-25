@@ -20,7 +20,7 @@ data {
   //initial population structure
   vector[2*a] N0;
   
-  //Prior covariance matrix for biases
+  //Prior covariance matrix for hunting selectivities (called biases in the code)
   matrix[2*a,2*a] L_bias;
 
   //Herring
@@ -84,7 +84,7 @@ transformed data{
 
 parameters {
   
-  // Biases
+  // Biases (hunting selectivity)
   vector[2*a] g_sw_sc;
   vector[2*a] g_fi_sc;
   vector[2*a] g_bc_sc;
@@ -139,7 +139,7 @@ parameters {
 
 transformed parameters{
 
-  //Biases
+  //Biases (hunting selectivity)
   vector[2*a] g_sw=L_bias*g_sw_sc;
   vector[2*a] g_fi=L_bias*g_fi_sc;
   vector[2*a] g_bc=L_bias*g_bc_sc;
@@ -414,7 +414,7 @@ model {
   v0 ~ cauchy(0,0.2);
   v5 ~ cauchy(0.88,0.2);
   
-  //Hunting and bycatch bias
+  //Hunting and bycatch bias (selectivity)
   
   g_sw_sc ~ normal(0,0.5);
   g_fi_sc ~ normal(0,0.5);

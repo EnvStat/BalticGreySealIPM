@@ -1,4 +1,9 @@
 
+# Note, in the code we use "bias" to denote hunting selectivity. The latter term 
+# is used in the paper. The difference between the paper and code arises from 
+# the reason that we used the less good "bias" in the original submission.
+
+
 # Initial set up
 # ======================
 library(rstan)
@@ -94,7 +99,7 @@ inits<- function(){ #Draw initial parameters from prior distributions
     v0=rnorm(1,0,0.2),
     v5=rnorm(1,0.88,0.2),
     
-    #Bias
+    #hunting selectivity ("bias" in the code) 
     g_sw=rnorm(12,0,0.1),
     g_fi=rnorm(12,0,0.1),
     g_bc=rnorm(12,0,0.1),
@@ -146,7 +151,7 @@ C=matrix(0,nrow=12, ncol=12)
 C[2:5,2:5]=0.95
 C[8:11,8:11]=0.95
 diag(C)=1
-L_bias=t(chol(C)) #Variance for multivariate Gaussian prior for biases
+L_bias=t(chol(C)) #Variance for multivariate Gaussian prior for hunting selectivities ("bias" in the code)
 
 
 data=list(a=6,t=t, 

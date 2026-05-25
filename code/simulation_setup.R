@@ -1,4 +1,8 @@
 
+# Note, in the code we use "bias" to denote hunting selectivity. The latter term 
+# is used in the paper. The difference between the paper and code arises from 
+# the reason that we used the less good "bias" in the original submission.
+
 #### Set up ####
 
 t=23
@@ -33,19 +37,19 @@ Q_sw.scenarios[4,] <- 1500
 Q_sw.scenarios[5,] <- 1800
 Q_sw.scenarios[6,] <- 2400
 
-##### Bias scenarios ####
+##### Bias (=selectivity) scenarios ####
 bias_sw=log(colMeans(samples$rho[,1,,3]/apply(samples$rho[,1,,3],1, mean))) #historical bias returned from our model fitting
 bias_fi=log(colMeans(samples$rho[,1,,4]/apply(samples$rho[,1,,4],1, mean)))
 
 
-bias=log(1.5) # 50% more likely to hunt seals in the "biased" groups
+bias=log(1.5) # 50% more likely to hunt seals in the "biased" (selectivity) groups
 
 bias_fi.scenarios <- matrix(NA,5 , 12)
 bias_fi.scenarios[1,]=bias_fi
-bias_fi.scenarios[2,]=c(bias,0,0,0,0,0,bias,0,0,0,0,0) #Bias towards pups
-bias_fi.scenarios[3,]=c(0,0,0,0,0,bias,0,0,0,0,0,bias) #Bias towards adults
-bias_fi.scenarios[4,]=c(0,0,0,0,0,0,bias,bias,bias,bias,bias,bias)  #Bias towards males
-bias_fi.scenarios[5,]=c(bias,bias,bias,bias,bias,bias,0,0,0,0,0,0)  #Bias towards females
+bias_fi.scenarios[2,]=c(bias,0,0,0,0,0,bias,0,0,0,0,0) #Bias (=selectivity) towards pups
+bias_fi.scenarios[3,]=c(0,0,0,0,0,bias,0,0,0,0,0,bias) #Bias (=selectivity) towards adults
+bias_fi.scenarios[4,]=c(0,0,0,0,0,0,bias,bias,bias,bias,bias,bias)  #Bias (=selectivity) towards males
+bias_fi.scenarios[5,]=c(bias,bias,bias,bias,bias,bias,0,0,0,0,0,0)  #Bias (=selectivity) towards females
 
 bias_sw.scenarios <- matrix(NA,5 , 12)
 bias_sw.scenarios[1,]=bias_sw

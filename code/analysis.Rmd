@@ -158,7 +158,11 @@ quantile(rowMeans(G), quantiles) #Average growth rate
 ## Read in and set
 
 ```{r}
-source(paste(code_folder,"simulation_setup.R",sep="")) # read in hunting quota, hunting bias and herring quality scenarios
+# Note, in the code we use "bias" to denote hunting selectivity. The latter term 
+# is used in the paper. The difference between the paper and code arises from 
+# the reason that we used the less good "bias" in the original submission.
+
+source(paste(code_folder,"simulation_setup.R",sep="")) # read in hunting quota, hunting selectivity (=bias in the code) and herring quality scenarios
 N.full.hunt=read.csv(paste(simulations_folder,"Simulation.csv",sep=""))
 N.composition.sim.median=read.csv(paste(simulations_folder,"Simulation_composition.csv",sep=""))
 b.df=read.csv(paste(simulations_folder,"Simulation_birth.csv",sep=""))
@@ -299,8 +303,12 @@ for ( i in 1:6){
 ```
 
 
-### Hunting bias (Figure 3)
+### Hunting selectivity (Figure 3)
+
 ```{r}
+# Note, in the code we use "bias" to denote hunting selectivity. The latter term 
+# is used in the paper. The difference between the paper and code arises from 
+# the reason that we used the less good "bias" in the original submission.
 
 N.full.hunt.bias=N.full.hunt[N.full.hunt$Herring_quality %in% c("Historical", "Mean of historical"),]
 N.full.hunt.bias$group=paste(N.full.hunt.bias$Scenario, N.full.hunt.bias$Hunting_bias)
@@ -315,7 +323,7 @@ p=ggplot(N.full.hunt.bias, aes(x=year, group=group,alpha=Hunting_bias,fill=Scena
   geom_ribbon(aes(ymin=lb, ymax=ub),linetype=1) +
   
   scale_fill_manual("", values=scenario.colors, breaks=scenario.breaks, guide="none") +
-  scale_linetype_manual("Hunting bias", values=bias.linetype, breaks=bias.breaks) +
+  scale_linetype_manual("Hunting selectivity", values=bias.linetype, breaks=bias.breaks) +
   scale_color_manual("Hunted Seals", values=scenario.colors, breaks=scenario.breaks) +
   scale_alpha_manual( values=bias.alpha, breaks=bias.breaks, guide="none") +
   
@@ -756,7 +764,7 @@ p=ggplot(N.full.hunt.short, aes(x=year, group=Scenario,alpha=Hunting_bias,fill=S
   geom_ribbon(aes(ymin=lb, ymax=ub),linetype=1) +
   
   scale_fill_manual("", values=scenario.colors, breaks=scenario.breaks, guide="none") +
-  scale_linetype_manual("Hunting bias", values=bias.linetype, breaks=bias.breaks) +
+  scale_linetype_manual("Hunting selectivity", values=bias.linetype, breaks=bias.breaks) +
   scale_color_manual("Hunted Seals", values=scenario.colors, breaks=scenario.breaks) +
   scale_alpha_manual( values=bias.alpha, breaks=bias.breaks, guide="none") +
   
