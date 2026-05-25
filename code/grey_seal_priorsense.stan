@@ -20,7 +20,7 @@ data {
   //initial population structure
   vector[2*a] N0;
   
-  //Prior covariance matrix for hunting selectivities (called biases in the code)
+  //Prior covariance matrix for hunting selectivity (called biases in the code)
   matrix[2*a,2*a] L_bias;
 
   //Herring
@@ -507,7 +507,7 @@ model {
 generated quantities{
   array[t] real<lower=0> y_hb_sw_sim;
   array[t] real<lower=0> y_hb_fi_sim;
-
+  
   //Aerial observations
   array[t+1] int<lower=0> y_sim;
 
@@ -518,7 +518,12 @@ generated quantities{
   //Reproductive signs
   array[4, t ] int<lower=0> z_sim;
   
+  // Prior and likelihood sensitivity parameters
+  vector[8] lprior;
+  vector[8] log_lik;
+  real tmp;
 
+  // Posterior predictive check predictions
   y_sim=neg_binomial_2_rng(mu*to_vector(N_tot), r);
 
    for ( i in 1:t){
@@ -533,7 +538,117 @@ generated quantities{
    }
    y_hb_sw_sim = normal_rng(H_sw_tot, 0.05*to_vector(H_sw_tot));
    y_hb_fi_sim = normal_rng(H_fi_tot, 0.05*to_vector(H_fi_tot));
+   
+   
+   // Variables likelihood sensitivity calculations
+   // -----------------------------------------------
+   //Aerial observations
+   tmp = 0;
+   for ( i in 1:t){
+     if(i<=22){
+       if (y[i]>10){
+         tmp += neg_binomial_2_lpmf(y[i] | mu*N_tot[i+1], r);
+       }
+     }
+   }
+   log_lik[1] = tmp;
+   
+   //Hunting bags
+   log_lik[2] = normal_lpdf(to_vector(y_hb_sw) | to_vector(H_sw_tot), 0.05*to_vector(H_sw_tot));
+   log_lik[3] = normal_lpdf(to_vector(y_hb_fi) | to_vector(H_fi_tot), 0.05*to_vector(H_fi_tot));
 
+   // Hunting samples
+   tmp = 0;
+   for ( i in 1:t){
+     tmp += multinomial_lpmf(y_hs_sw[,i] | H_sw[,i]/H_sw_tot[i]);
+   }
+   log_lik[4] = tmp;
+   
+   tmp = 0;
+   for ( i in 1:t){
+     if (i<22){
+       tmp += multinomial_lpmf(y_hs_fi[,i] | H_fi[,i]/H_fi_tot[i]);
+     }
+   }   
+   log_lik[5] = tmp;
+   
+   //By-catch samples
+   tmp = 0;
+   for ( i in 1:t){
+     tmp += multinomial_lpmf(y_bc[,i] | exp(g_bc).*D[,i]/(exp(g_bc)'*D[,i]));
+   }
+   log_lik[6] = tmp;
+   
+   //Pregnancy
+   log_lik[7] = binomial_lpmf(y_pr | y_pr_tot, to_vector(p));
+   
+   //Reproductive signs
+   tmp = 0;
+   for ( i in 1:t){
+     if (i<=22){
+       tmp += multinomial_lpmf(z_fi[,i] | gamma[,i]);
+     }
+   }
+   log_lik[8] = tmp;
+  
+  
+   // Variables prior sensitivity calculations
+   // -----------------------------------------------
+   //Initial population size
+   lprior[1] = lognormal_lpdf(n0 | 9.8, 0.1);
+   
+   //Natural mortality
+   lprior[2] = beta_lpdf(phi_a_sc | 1.1, 1.1);
+   //phi_sc ~ uniform (0,1);
+   //c ~uniform (0,1);
+   lprior[3] = cauchy_lpdf(v0 | 0,0.2) + cauchy_lpdf(v5 | 0.88,0.2);
+   
+   //Hunting and bycatch bias (=selectivity)
+   lprior[4] = normal_lpdf(g_sw_sc | 0,0.5) + normal_lpdf(g_fi_sc | 0,0.5) + normal_lpdf(g_bc_sc | 0,0.5);
+   
+   //Hunting effort sd
+   lprior[5] = cauchy_lpdf(sigma_h_sw | 0,0.1) + cauchy_lpdf(sigma_h_fi | 0,0.1);
+   
+   //Birth rate
+   //b0max ~ uniform (0,1);
+   //b0min_sc ~ uniform (0,1);
+   
+   lprior[6] = normal_lpdf(alpha_sc | 0,4) + normal_lpdf(beta | 0,3);
+   //w ~ uniform(0,1);
+   //theta0_sc ~ uniform(0,1);
+   
+   //Carrying capacity
+   lprior[7] = lognormal_lpdf(K | 11.3,0.3);
+
+   //Observation of aerial survey  
+   lprior[8] = beta_lpdf(mu | 32,9);
+   //r ~ lognormal (5.3, 1);
+   
+   //Observtion of reproductive signs
+   //kappa ~ uniform(0,1);
+   //pi_s_mean ~ uniform(0,1);
+   //pi_c_mean ~ uniform(0,1);
+   
+   //sigma_rep_c ~ normal (0,0.1);
+   //sigma_rep_s ~ normal (0,0.1);
+   
+   //standard normals for stochasticity
+   
+   //epsilon_h_sw ~ normal(0,1);
+   //epsilon_h_fi ~normal(0,1);
+   
+   //epsilon_rep_c ~normal(0,1);
+   //epsilon_rep_s ~normal(0,1);
+   
+   //Stochasicity for birth process
+   //epsilon_birth ~ normal(0,1);
+   //epsilon_sex ~ normal(0,1);
+   
+   //Stochasticity for state transitions
+   //for (i in 1:t){
+   //   u[,i] ~ normal(0,1);
+   //}
+   
 }
 
 

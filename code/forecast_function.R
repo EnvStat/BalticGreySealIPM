@@ -1,3 +1,9 @@
+
+# Note, in the code we use "bias" to denote hunting selectivity. The latter term 
+# is used in the paper. The difference between the paper and code arises from 
+# the reason that we used the less good "bias" in the original submission.
+
+
 # inverse logit transform
 logistic <- function(x) { return(1 / (1 + exp(-x))) }
 

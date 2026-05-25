@@ -8,13 +8,13 @@ library("bayesplot")
 library(zoo)
 
 
-df_hb=read.csv(paste(data_folder,"Hunting_bag_quota_FI_SW.csv", sep=""))
+df_hb=read.csv(paste(proc_data_folder,"Hunting_bag_quota_FI_SW.csv", sep=""))
 
 #### SWEDEN ####
 
 
 #Read in detailed hunting bags, clean and count the number of shot seals per month in each year
-df=read.csv(paste(data_folder,"Detailed_hunting_bag_SW.csv", sep=""))
+df=read.csv(paste(source_data_folder,"/Hunting_bag/Detailed_hunting_bag_SW.csv", sep=""))
 
 C=colnames(df)
 n=length(C)
@@ -102,14 +102,14 @@ ggsave(filename= paste(figure_folder,"detailed_h_SW_2009-2020.png",sep="" ),plot
 #### FINLAND ####
 
 
-df=read.csv(paste(data_folder,"Detailed_hunting_bag_FI_2001-2014.csv", sep=""))
+df=read.csv(paste(source_data_folder,"/Hunting_bag/Detailed_hunting_bag_FI_2001-2014.csv", sep=""))
 
 df$Date=as.Date(df$ti_tilastopaiva)
 df$Year=as.numeric(df$ti_tilastovuosi)
 df=df[c("Date", "Year")]
 df$Month=as.numeric(format(df$Date, "%m"))
 df1=df
-df=read.csv(paste(data_folder,"Detailed_hunting_bag_FI_2014-2024.csv", sep=""))
+df=read.csv(paste(source_data_folder,"/Hunting_bag/Detailed_hunting_bag_FI_2014-2024.csv", sep=""))
 
 df$Date=as.Date(df$point_of_time)
 df=df[c("Date")]

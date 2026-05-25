@@ -1,11 +1,16 @@
 #### Read in ####
 
+# Note, in the code we use "bias" to denote hunting selectivity. The latter term 
+# is used in the paper. The difference between the paper and code arises from 
+# the reason that we used the less good "bias" in the original submission.
+
+
 source(paste(code_folder,"readin.R",sep="")) # read in stan fit, samples, observed data
 
 #### Set up ####
 
 source(paste(code_folder,"forecast_function.R",sep="")) #contains simualting function
-source(paste(code_folder,"simulation_setup.R",sep="")) # read in hunting quota, hunting bias and herring quality scenarios
+source(paste(code_folder,"simulation_setup.R",sep="")) # read in hunting quota, hunting bias (=selectivity) and herring quality scenarios
 ##### Population size  and birth rate in modelled period 2003-2025 ####
 N.past <- apply(samples$N[idx,,1:(t+1)], c(1,3), sum)
 N.past.q<-t(apply(N.past,2, quantile, quantiles))
@@ -87,7 +92,7 @@ write.csv(N.full.hunt,paste(simulations_folder, "Simulation.csv", sep="")) # Med
 
 
 N.composition.sim.median=apply(N.composition.sim, c(1,2), quantile, 0.5)
-write.csv(N.composition.sim.median,paste(simulations_folder, "Simulation_composition.csv",sep=""),row.names = FALSE) # Demographic group specific median and 95% CI of pop size 2025-2080 for 2024 harvest size and historcal bias and herring
+write.csv(N.composition.sim.median,paste(simulations_folder, "Simulation_composition.csv",sep=""),row.names = FALSE) # Demographic group specific median and 95% CI of pop size 2025-2080 for 2024 harvest size and historcal bias (=selectivity) and herring
 
 b=apply(b.sim, c(1,3), quantile, quantiles)
 b.df <- data.frame(Scenario = rep(as.factor(her.breaks), each=length(years.sim.birth)), 
@@ -108,14 +113,14 @@ for ( j in 1:length(H.list)){
   N.sim.80.her[j,]=N.sim[5,1,H.list[j],,length(years.sim)]
 }
 
-write.csv(as.data.frame(N.sim.80.bias), paste(simulations_folder,"Simulation_2080_hunting_bias.csv",sep=""), row.names = FALSE) #Posterior distribution in 2080 under historical herring and varying harvest size and bias
-write.csv(as.data.frame(N.sim.80.her),paste(simulations_folder, "Simulation_2080_hunting_her.csv",sep=""), row.names = FALSE)  #Posterior distribution in 2080 under harvest size of 3600, historical bias and varying herring quality
+write.csv(as.data.frame(N.sim.80.bias), paste(simulations_folder,"Simulation_2080_hunting_bias.csv",sep=""), row.names = FALSE) #Posterior distribution in 2080 under historical herring and varying harvest size and bias (=selectivity)
+write.csv(as.data.frame(N.sim.80.her),paste(simulations_folder, "Simulation_2080_hunting_her.csv",sep=""), row.names = FALSE)  #Posterior distribution in 2080 under harvest size of 3600, historical bias (=selectivity) and varying herring quality
 
 
 N.sim.80.3050=apply(N.sim[4,,,,length(years.sim)]>100, c(1,2), sum)/length(idx)*100
 N.sim.80.3600=apply(N.sim[5,,,,length(years.sim)]>100, c(1,2), sum)/length(idx)*100
 N.sim.80.4800=apply(N.sim[6,,,,length(years.sim)]>100, c(1,2), sum)/length(idx)*100
 
-write.csv(as.data.frame(N.sim.80.3050), paste(simulations_folder,"Simulation_2080_3050.csv",sep=""), row.names = FALSE) #Posterior distribution in 2080 under historical herring and varying harvest size and bias
-write.csv(as.data.frame(N.sim.80.3600), paste(simulations_folder,"Simulation_2080_3600.csv",sep=""), row.names = FALSE) #Posterior distribution in 2080 under historical herring and varying harvest size and bias
-write.csv(as.data.frame(N.sim.80.4800),paste(simulations_folder, "Simulation_2080_4800.csv",sep=""), row.names = FALSE)  #Posterior distribution in 2080 under harvest size of 3600, historical bias and varying herring quality
+write.csv(as.data.frame(N.sim.80.3050), paste(simulations_folder,"Simulation_2080_3050.csv",sep=""), row.names = FALSE) #Posterior distribution in 2080 under historical herring and varying harvest size and bias (=selectivity)
+write.csv(as.data.frame(N.sim.80.3600), paste(simulations_folder,"Simulation_2080_3600.csv",sep=""), row.names = FALSE) #Posterior distribution in 2080 under historical herring and varying harvest size and bias (=selectivity)
+write.csv(as.data.frame(N.sim.80.4800),paste(simulations_folder, "Simulation_2080_4800.csv",sep=""), row.names = FALSE)  #Posterior distribution in 2080 under harvest size of 3600, historical bias (=selectivity) and varying herring quality

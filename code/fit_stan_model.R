@@ -1,19 +1,36 @@
+
+# Note, in the code we use "bias" to denote hunting selectivity. The latter term 
+# is used in the paper. The difference between the paper and code arises from 
+# the reason that we used the less good "bias" in the original submission.
+
+
+# Initial set up
+# ======================
 library(rstan)
+library(extraDistr)
 
 options(mc.cores = parallel::detectCores())
 rstan_options(auto_write=TRUE)
 
-# Set constants
+# Set the folders
+
+# Update this to be the path to your project folder
+project.folder = "/home/jpvanhat/Documents_extended/Projects_data/Baltic_seals/baltic_grey_seals/BalticGreySealIPM"
+setwd(paste0(project.folder, "/code"))
+source("set_folders.R")
+
+# Set model details 
 year=seq(from=2003, to=2025, length=23) #years data covers
-t=length(year) #number of modelled years
+t=length(year) # number of modelled years
 a=6 #number of age classes (0,1,2,3,4,5+)
 
 
 ##### READ IN DATA ########
+# ======================
 
 setwd(proc_data_folder)
 
-#Aeraial count
+#Aerial count
 df_count=read.csv("Aerial_count.csv")
 y=df_count$Total
 y[16]=0 # Stan does not accept NA
@@ -82,7 +99,7 @@ inits<- function(){ #Draw initial parameters from prior distributions
     v0=rnorm(1,0,0.2),
     v5=rnorm(1,0.88,0.2),
     
-    #Bias
+    #hunting selectivity ("bias" in the code) 
     g_sw=rnorm(12,0,0.1),
     g_fi=rnorm(12,0,0.1),
     g_bc=rnorm(12,0,0.1),
@@ -134,7 +151,7 @@ C=matrix(0,nrow=12, ncol=12)
 C[2:5,2:5]=0.95
 C[8:11,8:11]=0.95
 diag(C)=1
-L_bias=t(chol(C)) #Variance for multivariate Gaussian prior for biases
+L_bias=t(chol(C)) #Variance for multivariate Gaussian prior for hunting selectivities ("bias" in the code)
 
 
 data=list(a=6,t=t, 
@@ -158,8 +175,8 @@ data=list(a=6,t=t,
 setwd(code_folder)
 
 
-stan_model <- stan_model("grey_seal.stan") 
-
+#stan_model <- stan_model("grey_seal.stan") 
+stan_model <- stan_model("grey_seal_priorsense.stan") 
 
 fit <- sampling(stan_model, data = data, iter = 4000, warmup=2000, chains = 4, 
                          init =list(inits(),inits(),inits(),inits()),
@@ -171,3 +188,5 @@ fit <- sampling(stan_model, data = data, iter = 4000, warmup=2000, chains = 4,
 setwd(stan_fit_folder)
 
 saveRDS(fit,"grey_seal_fit.rds")
+
+setwd(code_folder)
